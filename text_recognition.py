@@ -123,8 +123,88 @@ boxes = non_max_suppression(np.array(rects), probs=confidences)
 # initialize the list of results
 results = []
 
-fake_box = [(244, 63, 356, 120), (234, 507, 416, 560), (130, 649, 208, 699), (350, 898, 426, 940)]
+# example (startX, startY, endX, endY)
+fake_box = [(204, 63, 356, 120), (234, 507, 416, 560), (130, 649, 208, 699), (350, 898, 426, 940)]
 # loop over the bounding boxes
+# for (startX, startY, endX, endY) in boxes:
+#
+# 	# scale the bounding box coordinates based on the respective
+# 	# ratios
+# 	startX = int(startX * rW)
+# 	startY = int(startY * rH)
+# 	endX = int(endX * rW)
+# 	endY = int(endY * rH)
+#
+# 	# in order to obtain a better OCR of the text we can potentially
+# 	# apply a bit of padding surrounding the bounding box -- here we
+# 	# are computing the deltas in both the x and y directions
+# 	dX = int((endX - startX) * args["padding"])
+# 	dY = int((endY - startY) * args["padding"])
+#
+# 	# apply padding to each side of the bounding box, respectively
+# 	startX = max(0, startX - dX)
+# 	startY = max(0, startY - dY)
+# 	endX = min(origW, endX + (dX * 2))
+# 	endY = min(origH, endY + (dY * 2))
+# 	if startX == 244:
+#
+# 		# extract the actual padded ROI
+# 		roi = orig[startY:endY, startX:endX]
+# 		#config = ("-l eng")
+# 		config = ("-l eng --oem 1 --psm 3")
+# 		text = pytesseract.image_to_string(roi, config=config)
+#
+# 		# add the bounding box coordinates and OCR'd text to the list
+# 		# of results
+# 		results.append(((startX, startY, endX, endY), text))
+# 	elif  startX == 234:
+# 		# extract the actual padded ROI
+# 		roi = orig[startY:endY, startX:endX]
+# 		# config = ("-l eng")
+# 		config = ("-l eng --oem 1 --psm 3")
+# 		text = pytesseract.image_to_string(roi, config=config)
+#
+# 		# add the bounding box coordinates and OCR'd text to the list
+# 		# of results
+# 		results.append(((startX, startY, endX, endY), text))
+# 	elif startX == 110:
+# 		startX = startX + 20
+# 		endX = endX + 20
+# 		# extract the actual padded ROI
+# 		roi = orig[startY:endY, startX:endX]
+# 		# config = ("-l eng")
+# 		config = ("-l eng --oem 1 --psm 3")
+# 		text = pytesseract.image_to_string(roi, config=config)
+#
+# 		# add the bounding box coordinates and OCR'd text to the list
+# 		# of results
+# 		results.append(((startX, startY, endX, endY), text))
+# 	elif startX == 340:
+# 		startX = startX+10
+# 		endX = endX +30
+# 		# startX = startX + 50
+# 		# startY = startY + 50
+# 		# extract the actual padded ROI
+# 		roi = orig[startY:endY, startX:endX]
+# 		# config = ("-l eng")
+# 		config = ("-l eng --oem 1 --psm 3")
+# 		text = pytesseract.image_to_string(roi, config=config)
+#
+# 		# add the bounding box coordinates and OCR'd text to the list
+# 		# of results
+# 		results.append(((startX, startY, endX, endY), text))
+# 	# else:
+# 	# 	# extract the actual padded ROI
+# 	# 	roi = orig[startY:endY, startX:endX]
+# 	# 	# config = ("-l eng")
+# 	# 	config = ("-l eng --oem 1 --psm 3")
+# 	# 	text = pytesseract.image_to_string(roi, config=config)
+# 	#
+# 	# 	# add the bounding box coordinates and OCR'd text to the list
+# 	# 	# of results
+# 	# 	results.append(((startX, startY, endX, endY), text))
+# # sort the results bounding box coordinates from top to bottom
+
 for (startX, startY, endX, endY) in boxes:
 
 	# scale the bounding box coordinates based on the respective
@@ -203,6 +283,7 @@ for (startX, startY, endX, endY) in boxes:
 	# 	# of results
 	# 	results.append(((startX, startY, endX, endY), text))
 # sort the results bounding box coordinates from top to bottom
+
 results = sorted(results, key=lambda r:r[0][1])
 
 # loop over the results
