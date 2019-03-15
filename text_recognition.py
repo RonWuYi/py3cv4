@@ -83,251 +83,256 @@ def decode_predictions(scores, geometry):
 
 
 # load the input image and grab the image dimensions
-image = cv2.imread(args["image"])
-orig = image.copy()
-(origH, origW) = image.shape[:2]
+if cv2.imread(args["image"]).any():
+	image = cv2.imread(args["image"])
+	orig = image.copy()
+	(origH, origW) = image.shape[:2]
 
-# set the new width and height and then determine the ratio in change
-# for both the width and height
-(newW, newH) = (args["width"], args["height"])
-rW = origW / float(newW)
-rH = origH / float(newH)
+	# set the new width and height and then determine the ratio in change
+	# for both the width and height
+	(newW, newH) = (args["width"], args["height"])
+	rW = origW / float(newW)
+	rH = origH / float(newH)
 
-# resize the image and grab the new image dimensions
-image = cv2.resize(image, (newW, newH))
-(H, W) = image.shape[:2]
-
-
-# define the two output layer names for the EAST detector model that
-# we are interested in -- the first is the output probabilities and the
-# second can be used to derive the bounding box coordinates of text
-layerNames = [
-	"feature_fusion/Conv_7/Sigmoid",
-	"feature_fusion/concat_3"]
-
-# load the pre-trained EAST text detector
-print("[INFO] loading EAST text detector...")
-net = cv2.dnn.readNet(args["east"])
-
-# construct a blob from the image and then perform a forward pass of
-# the model to obtain the two output layer sets
-blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
-	(123.68, 116.78, 103.94), swapRB=True, crop=False)
-net.setInput(blob)
-(scores, geometry) = net.forward(layerNames)
-
-# decode the predictions, then  apply non-maxima suppression to
-# suppress weak, overlapping bounding boxes
-(rects, confidences) = decode_predictions(scores, geometry)
-boxes = non_max_suppression(np.array(rects), probs=confidences)
+	# resize the image and grab the new image dimensions
+	image = cv2.resize(image, (newW, newH))
+	(H, W) = image.shape[:2]
 
 
-# initialize the list of results
-results = []
+	# define the two output layer names for the EAST detector model that
+	# we are interested in -- the first is the output probabilities and the
+	# second can be used to derive the bounding box coordinates of text
+	layerNames = [
+		"feature_fusion/Conv_7/Sigmoid",
+		"feature_fusion/concat_3"]
 
-# example (startX, startY, endX, endY)
-fake_box = [(204, 63, 356, 120), (234, 507, 416, 560), (130, 649, 208, 699), (350, 898, 426, 940)]
-# loop over the bounding boxes
-# for (startX, startY, endX, endY) in boxes:
-#
-# 	# scale the bounding box coordinates based on the respective
-# 	# ratios
-# 	startX = int(startX * rW)
-# 	startY = int(startY * rH)
-# 	endX = int(endX * rW)
-# 	endY = int(endY * rH)
-#
-# 	# in order to obtain a better OCR of the text we can potentially
-# 	# apply a bit of padding surrounding the bounding box -- here we
-# 	# are computing the deltas in both the x and y directions
-# 	dX = int((endX - startX) * args["padding"])
-# 	dY = int((endY - startY) * args["padding"])
-#
-# 	# apply padding to each side of the bounding box, respectively
-# 	startX = max(0, startX - dX)
-# 	startY = max(0, startY - dY)
-# 	endX = min(origW, endX + (dX * 2))
-# 	endY = min(origH, endY + (dY * 2))
-# 	if startX == 244:
-#
-# 		# extract the actual padded ROI
-# 		roi = orig[startY:endY, startX:endX]
-# 		#config = ("-l eng")
-# 		config = ("-l eng --oem 1 --psm 3")
-# 		text = pytesseract.image_to_string(roi, config=config)
-#
-# 		# add the bounding box coordinates and OCR'd text to the list
-# 		# of results
-# 		results.append(((startX, startY, endX, endY), text))
-# 	elif  startX == 234:
-# 		# extract the actual padded ROI
-# 		roi = orig[startY:endY, startX:endX]
-# 		# config = ("-l eng")
-# 		config = ("-l eng --oem 1 --psm 3")
-# 		text = pytesseract.image_to_string(roi, config=config)
-#
-# 		# add the bounding box coordinates and OCR'd text to the list
-# 		# of results
-# 		results.append(((startX, startY, endX, endY), text))
-# 	elif startX == 110:
-# 		startX = startX + 20
-# 		endX = endX + 20
-# 		# extract the actual padded ROI
-# 		roi = orig[startY:endY, startX:endX]
-# 		# config = ("-l eng")
-# 		config = ("-l eng --oem 1 --psm 3")
-# 		text = pytesseract.image_to_string(roi, config=config)
-#
-# 		# add the bounding box coordinates and OCR'd text to the list
-# 		# of results
-# 		results.append(((startX, startY, endX, endY), text))
-# 	elif startX == 340:
-# 		startX = startX+10
-# 		endX = endX +30
-# 		# startX = startX + 50
-# 		# startY = startY + 50
-# 		# extract the actual padded ROI
-# 		roi = orig[startY:endY, startX:endX]
-# 		# config = ("-l eng")
-# 		config = ("-l eng --oem 1 --psm 3")
-# 		text = pytesseract.image_to_string(roi, config=config)
-#
-# 		# add the bounding box coordinates and OCR'd text to the list
-# 		# of results
-# 		results.append(((startX, startY, endX, endY), text))
-	# else:
-	# 	# extract the actual padded ROI
-	# 	roi = orig[startY:endY, startX:endX]
-	# 	# config = ("-l eng")
-	# 	config = ("-l eng --oem 1 --psm 3")
-	# 	text = pytesseract.image_to_string(roi, config=config)
+	# load the pre-trained EAST text detector
+	print("[INFO] loading EAST text detector...")
+	net = cv2.dnn.readNet(args["east"])
+
+	# construct a blob from the image and then perform a forward pass of
+	# the model to obtain the two output layer sets
+	blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
+		(123.68, 116.78, 103.94), swapRB=True, crop=False)
+	net.setInput(blob)
+	(scores, geometry) = net.forward(layerNames)
+
+	# decode the predictions, then  apply non-maxima suppression to
+	# suppress weak, overlapping bounding boxes
+	(rects, confidences) = decode_predictions(scores, geometry)
+	boxes = non_max_suppression(np.array(rects), probs=confidences)
+
+
+	# initialize the list of results
+	results = []
+
+	# example (startX, startY, endX, endY)
+	fake_box = [(204, 63, 356, 120), (234, 507, 416, 560), (130, 649, 208, 699), (350, 898, 426, 940)]
+	# loop over the bounding boxes
+	# for (startX, startY, endX, endY) in boxes:
 	#
-	# 	# add the bounding box coordinates and OCR'd text to the list
-	# 	# of results
-	# 	results.append(((startX, startY, endX, endY), text))
-# sort the results bounding box coordinates from top to bottom
-
-for (startX, startY, endX, endY) in boxes:
-
-	# scale the bounding box coordinates based on the respective
-	# ratios
-	startX = int(startX * rW)
-	startY = int(startY * rH)
-	endX = int(endX * rW)
-	endY = int(endY * rH)
-
-	# in order to obtain a better OCR of the text we can potentially
-	# apply a bit of padding surrounding the bounding box -- here we
-	# are computing the deltas in both the x and y directions
-	dX = int((endX - startX) * args["padding"])
-	dY = int((endY - startY) * args["padding"])
-
-	# apply padding to each side of the bounding box, respectively
-	startX = max(0, startX - dX)
-	startY = max(0, startY - dY)
-	endX = min(origW, endX + (dX * 2))
-	endY = min(origH, endY + (dY * 2))
-	if startX == 244:
-		# startX -= 20
-		endX = endX + 30
+	# 	# scale the bounding box coordinates based on the respective
+	# 	# ratios
+	# 	startX = int(startX * rW)
+	# 	startY = int(startY * rH)
+	# 	endX = int(endX * rW)
+	# 	endY = int(endY * rH)
+	#
+	# 	# in order to obtain a better OCR of the text we can potentially
+	# 	# apply a bit of padding surrounding the bounding box -- here we
+	# 	# are computing the deltas in both the x and y directions
+	# 	dX = int((endX - startX) * args["padding"])
+	# 	dY = int((endY - startY) * args["padding"])
+	#
+	# 	# apply padding to each side of the bounding box, respectively
+	# 	startX = max(0, startX - dX)
+	# 	startY = max(0, startY - dY)
+	# 	endX = min(origW, endX + (dX * 2))
+	# 	endY = min(origH, endY + (dY * 2))
+	# 	if startX == 244:
+	#
+	# 		# extract the actual padded ROI
+	# 		roi = orig[startY:endY, startX:endX]
+	# 		#config = ("-l eng")
+	# 		config = ("-l eng --oem 1 --psm 3")
+	# 		text = pytesseract.image_to_string(roi, config=config)
+	#
+	# 		# add the bounding box coordinates and OCR'd text to the list
+	# 		# of results
+	# 		results.append(((startX, startY, endX, endY), text))
+	# 	elif  startX == 234:
+	# 		# extract the actual padded ROI
+	# 		roi = orig[startY:endY, startX:endX]
+	# 		# config = ("-l eng")
+	# 		config = ("-l eng --oem 1 --psm 3")
+	# 		text = pytesseract.image_to_string(roi, config=config)
+	#
+	# 		# add the bounding box coordinates and OCR'd text to the list
+	# 		# of results
+	# 		results.append(((startX, startY, endX, endY), text))
+	# 	elif startX == 110:
+	# 		startX = startX + 20
+	# 		endX = endX + 20
+	# 		# extract the actual padded ROI
+	# 		roi = orig[startY:endY, startX:endX]
+	# 		# config = ("-l eng")
+	# 		config = ("-l eng --oem 1 --psm 3")
+	# 		text = pytesseract.image_to_string(roi, config=config)
+	#
+	# 		# add the bounding box coordinates and OCR'd text to the list
+	# 		# of results
+	# 		results.append(((startX, startY, endX, endY), text))
+	# 	elif startX == 340:
+	# 		startX = startX+10
+	# 		endX = endX +30
+	# 		# startX = startX + 50
+	# 		# startY = startY + 50
+	# 		# extract the actual padded ROI
+	# 		roi = orig[startY:endY, startX:endX]
+	# 		# config = ("-l eng")
+	# 		config = ("-l eng --oem 1 --psm 3")
+	# 		text = pytesseract.image_to_string(roi, config=config)
+	#
+	# 		# add the bounding box coordinates and OCR'd text to the list
+	# 		# of results
+	# 		results.append(((startX, startY, endX, endY), text))
+		# else:
+		# 	# extract the actual padded ROI
+		# 	roi = orig[startY:endY, startX:endX]
+		# 	# config = ("-l eng")
+		# 	config = ("-l eng --oem 1 --psm 3")
+		# 	text = pytesseract.image_to_string(roi, config=config)
 		#
-		# # startY -= 20
-		endY += 3
-		# extract the actual padded ROI
-		roi = orig[startY:endY, startX:endX]
-		#config = ("-l eng")
-		config = ("-l eng --oem 1 --psm 3")
-		text = pytesseract.image_to_string(roi, config=config)
+		# 	# add the bounding box coordinates and OCR'd text to the list
+		# 	# of results
+		# 	results.append(((startX, startY, endX, endY), text))
+	# sort the results bounding box coordinates from top to bottom
 
-		# add the bounding box coordinates and OCR'd text to the list
-		# of results
-		re_result = re.search(r"(\d+)", text)
-		results.append(((startX, startY, endX, endY), re_result.group(0)))
-	elif startX == 234:
-		startX -= 20
-		endX += 20
+	for (startX, startY, endX, endY) in boxes:
 
-		startY += 5
-		# endY -=10
-		# extract the actual padded ROI
-		roi = orig[startY:endY, startX:endX]
-		# config = ("-l eng")
-		config = ("-l eng --oem 1 --psm 3")
-		text = pytesseract.image_to_string(roi, config=config)
+		# scale the bounding box coordinates based on the respective
+		# ratios
+		startX = int(startX * rW)
+		startY = int(startY * rH)
+		endX = int(endX * rW)
+		endY = int(endY * rH)
 
-		# add the bounding box coordinates and OCR'd text to the list
-		# of results
-		results.append(((startX, startY, endX, endY), text))
-	# if startX == 110:
-	elif startX == 110:
-		startX = startX + 200
-		endX = endX + 190
-		startY -= 60
-		endY -=70
-		# extract the actual padded ROI
-		roi = orig[startY:endY, startX:endX]
-		# config = ("-l eng")
-		config = ("-l eng --oem 1 --psm 3")
-		text = pytesseract.image_to_string(roi, config=config)
+		# in order to obtain a better OCR of the text we can potentially
+		# apply a bit of padding surrounding the bounding box -- here we
+		# are computing the deltas in both the x and y directions
+		dX = int((endX - startX) * args["padding"])
+		dY = int((endY - startY) * args["padding"])
 
-		# add the bounding box coordinates and OCR'd text to the list
-		# of results
-		re_result = re.search(r"(\d+)", text)
-		results.append(((startX, startY, endX, endY), re_result.group(0)))
-	elif startX == 340:
-		startX = startX+10
-		endX = endX +40
-		# startX = startX + 50
-		# startY = startY + 50
-		# extract the actual padded ROI
-		roi = orig[startY:endY, startX:endX]
-		# config = ("-l eng")
-		config = ("-l eng --oem 1 --psm 3")
-		text = pytesseract.image_to_string(roi, config=config)
+		# apply padding to each side of the bounding box, respectively
+		startX = max(0, startX - dX)
+		startY = max(0, startY - dY)
+		endX = min(origW, endX + (dX * 2))
+		endY = min(origH, endY + (dY * 2))
+		if startX == 244:
+			# startX -= 20
+			endX = endX + 30
+			#
+			# # startY -= 20
+			endY += 3
+			# extract the actual padded ROI
+			roi = orig[startY:endY, startX:endX]
+			#config = ("-l eng")
+			config = ("-l eng --oem 1 --psm 3")
+			text = pytesseract.image_to_string(roi, config=config)
 
-		# add the bounding box coordinates and OCR'd text to the list
-		# of results
-		re_result = re.search(r"(\d+)", text)
-		results.append(((startX, startY, endX, endY), re_result.group(0)))
-	# else:
-	# 	# extract the actual padded ROI
-	# 	roi = orig[startY:endY, startX:endX]
-	# 	# config = ("-l eng")
-	# 	config = ("-l eng --oem 1 --psm 3")
-	# 	text = pytesseract.image_to_string(roi, config=config)
-	#
-	# 	# add the bounding box coordinates and OCR'd text to the list
-	# 	# of results
-	# 	results.append(((startX, startY, endX, endY), text))
-# sort the results bounding box coordinates from top to bottom
+			# add the bounding box coordinates and OCR'd text to the list
+			# of results
+			re_result = re.search(r"(\d+)", text)
+			results.append(((startX, startY, endX, endY), re_result.group(0)))
+		elif startX == 234:
+			startX -= 20
+			endX += 20
 
-results = sorted(results, key=lambda r:r[0][1])
+			startY += 5
+			# endY -=10
+			# extract the actual padded ROI
+			roi = orig[startY:endY, startX:endX]
+			# config = ("-l eng")
+			config = ("-l eng --oem 1 --psm 3")
+			text = pytesseract.image_to_string(roi, config=config)
 
-# loop over the results
-for ((startX, startY, endX, endY), text) in results:
+			# add the bounding box coordinates and OCR'd text to the list
+			# of results
+			results.append(((startX, startY, endX, endY), text))
+		# if startX == 110:
+		elif startX == 110:
+			startX = startX + 200
+			endX = endX + 190
+			startY -= 60
+			endY -=70
+			# extract the actual padded ROI
+			roi = orig[startY:endY, startX:endX]
+			# config = ("-l eng")
+			config = ("-l eng --oem 1 --psm 3")
+			text = pytesseract.image_to_string(roi, config=config)
 
-	# display the text OCR'd by Tesseract
-	print("OCR TEXT")
-	print("========")
-	print("{}\n".format(text))
-	# print("text type is {}\n".format(type(text)))
-	# print("lenth  is {}\n".format(len(text)))
-	# re_result = re.search(r"(\d+)", text)
-	# print("{}\n".format(re_result.groups(0)[0]))
-	# print("type is {}\n".format(type(text)))
-	# strip out non-ASCII text so we can draw the text on the image
-	# using OpenCV, then draw the text and a bounding box surrounding
-	# the text region of the input image
-	text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
-	output = orig.copy()
-	cv2.rectangle(output, (startX, startY), (endX, endY),
-		(0, 0, 255), 2)
-	cv2.putText(output, text, (startX, startY - 20),
-		cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
-	print("we are in sX{}, sY{}, eX{}, eY{}".format(startX,
-													startY, endX, endY))
-	# show the output image
-	#
-	# re_result = re.search(r"(\d+)", output)
-	cv2.imshow("Text Detection", output)
-	cv2.waitKey(0)
+			# add the bounding box coordinates and OCR'd text to the list
+			# of results
+			re_result = re.search(r"(\d+)", text)
+			results.append(((startX, startY, endX, endY), re_result.group(0)))
+		elif startX == 340:
+			startX = startX+10
+			endX = endX +40
+			# startX = startX + 50
+			# startY = startY + 50
+			# extract the actual padded ROI
+			roi = orig[startY:endY, startX:endX]
+			# config = ("-l eng")
+			config = ("-l eng --oem 1 --psm 3")
+			text = pytesseract.image_to_string(roi, config=config)
+
+			# add the bounding box coordinates and OCR'd text to the list
+			# of results
+			re_result = re.search(r"(\d+)", text)
+			results.append(((startX, startY, endX, endY), re_result.group(0)))
+		# else:
+		# 	# extract the actual padded ROI
+		# 	roi = orig[startY:endY, startX:endX]
+		# 	# config = ("-l eng")
+		# 	config = ("-l eng --oem 1 --psm 3")
+		# 	text = pytesseract.image_to_string(roi, config=config)
+		#
+		# 	# add the bounding box coordinates and OCR'd text to the list
+		# 	# of results
+		# 	results.append(((startX, startY, endX, endY), text))
+	# sort the results bounding box coordinates from top to bottom
+
+	results = sorted(results, key=lambda r:r[0][1])
+
+	# loop over the results
+	for ((startX, startY, endX, endY), text) in results:
+
+		# display the text OCR'd by Tesseract
+		print("OCR TEXT")
+		print("========")
+		print("{}\n".format(text))
+		# print("text type is {}\n".format(type(text)))
+		# print("lenth  is {}\n".format(len(text)))
+		# re_result = re.search(r"(\d+)", text)
+		# print("{}\n".format(re_result.groups(0)[0]))
+		# print("type is {}\n".format(type(text)))
+		# strip out non-ASCII text so we can draw the text on the image
+		# using OpenCV, then draw the text and a bounding box surrounding
+		# the text region of the input image
+		text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
+		output = orig.copy()
+		cv2.rectangle(output, (startX, startY), (endX, endY),
+			(0, 0, 255), 2)
+		cv2.putText(output, text, (startX, startY - 20),
+			cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+		print("we are in sX{}, sY{}, eX{}, eY{}".format(startX,
+														startY, endX, endY))
+		# show the output image
+		#
+		# re_result = re.search(r"(\d+)", output)
+		cv2.imshow("Text Detection", output)
+		cv2.waitKey(0)
+else:
+	pass
+	# image = []
+	# for i in image:
