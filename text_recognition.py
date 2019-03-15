@@ -1,8 +1,10 @@
 from imutils.object_detection import non_max_suppression
+
 import numpy as np
 import pytesseract
 import argparse
 import cv2
+import re
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -193,17 +195,17 @@ fake_box = [(204, 63, 356, 120), (234, 507, 416, 560), (130, 649, 208, 699), (35
 # 		# add the bounding box coordinates and OCR'd text to the list
 # 		# of results
 # 		results.append(((startX, startY, endX, endY), text))
-# 	# else:
-# 	# 	# extract the actual padded ROI
-# 	# 	roi = orig[startY:endY, startX:endX]
-# 	# 	# config = ("-l eng")
-# 	# 	config = ("-l eng --oem 1 --psm 3")
-# 	# 	text = pytesseract.image_to_string(roi, config=config)
-# 	#
-# 	# 	# add the bounding box coordinates and OCR'd text to the list
-# 	# 	# of results
-# 	# 	results.append(((startX, startY, endX, endY), text))
-# # sort the results bounding box coordinates from top to bottom
+	# else:
+	# 	# extract the actual padded ROI
+	# 	roi = orig[startY:endY, startX:endX]
+	# 	# config = ("-l eng")
+	# 	config = ("-l eng --oem 1 --psm 3")
+	# 	text = pytesseract.image_to_string(roi, config=config)
+	#
+	# 	# add the bounding box coordinates and OCR'd text to the list
+	# 	# of results
+	# 	results.append(((startX, startY, endX, endY), text))
+# sort the results bounding box coordinates from top to bottom
 
 for (startX, startY, endX, endY) in boxes:
 
@@ -226,7 +228,11 @@ for (startX, startY, endX, endY) in boxes:
 	endX = min(origW, endX + (dX * 2))
 	endY = min(origH, endY + (dY * 2))
 	if startX == 244:
-
+		# startX -= 20
+		endX = endX + 30
+		#
+		# # startY -= 20
+		endY += 3
 		# extract the actual padded ROI
 		roi = orig[startY:endY, startX:endX]
 		#config = ("-l eng")
@@ -235,8 +241,14 @@ for (startX, startY, endX, endY) in boxes:
 
 		# add the bounding box coordinates and OCR'd text to the list
 		# of results
-		results.append(((startX, startY, endX, endY), text))
-	elif  startX == 234:
+		re_result = re.search(r"(\d+)", text)
+		results.append(((startX, startY, endX, endY), re_result.group(0)))
+	elif startX == 234:
+		startX -= 20
+		endX += 20
+
+		startY += 5
+		# endY -=10
 		# extract the actual padded ROI
 		roi = orig[startY:endY, startX:endX]
 		# config = ("-l eng")
@@ -246,9 +258,12 @@ for (startX, startY, endX, endY) in boxes:
 		# add the bounding box coordinates and OCR'd text to the list
 		# of results
 		results.append(((startX, startY, endX, endY), text))
+	# if startX == 110:
 	elif startX == 110:
-		startX = startX + 20
-		endX = endX + 20
+		startX = startX + 200
+		endX = endX + 190
+		startY -= 60
+		endY -=70
 		# extract the actual padded ROI
 		roi = orig[startY:endY, startX:endX]
 		# config = ("-l eng")
@@ -257,10 +272,11 @@ for (startX, startY, endX, endY) in boxes:
 
 		# add the bounding box coordinates and OCR'd text to the list
 		# of results
-		results.append(((startX, startY, endX, endY), text))
+		re_result = re.search(r"(\d+)", text)
+		results.append(((startX, startY, endX, endY), re_result.group(0)))
 	elif startX == 340:
 		startX = startX+10
-		endX = endX +30
+		endX = endX +40
 		# startX = startX + 50
 		# startY = startY + 50
 		# extract the actual padded ROI
@@ -271,7 +287,8 @@ for (startX, startY, endX, endY) in boxes:
 
 		# add the bounding box coordinates and OCR'd text to the list
 		# of results
-		results.append(((startX, startY, endX, endY), text))
+		re_result = re.search(r"(\d+)", text)
+		results.append(((startX, startY, endX, endY), re_result.group(0)))
 	# else:
 	# 	# extract the actual padded ROI
 	# 	roi = orig[startY:endY, startX:endX]
@@ -293,7 +310,11 @@ for ((startX, startY, endX, endY), text) in results:
 	print("OCR TEXT")
 	print("========")
 	print("{}\n".format(text))
-
+	# print("text type is {}\n".format(type(text)))
+	# print("lenth  is {}\n".format(len(text)))
+	# re_result = re.search(r"(\d+)", text)
+	# print("{}\n".format(re_result.groups(0)[0]))
+	# print("type is {}\n".format(type(text)))
 	# strip out non-ASCII text so we can draw the text on the image
 	# using OpenCV, then draw the text and a bounding box surrounding
 	# the text region of the input image
@@ -306,5 +327,7 @@ for ((startX, startY, endX, endY), text) in results:
 	print("we are in sX{}, sY{}, eX{}, eY{}".format(startX,
 													startY, endX, endY))
 	# show the output image
+	#
+	# re_result = re.search(r"(\d+)", output)
 	cv2.imshow("Text Detection", output)
 	cv2.waitKey(0)
