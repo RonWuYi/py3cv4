@@ -21,7 +21,8 @@ ap.add_argument("-e", "--height", type=int, default=320,
 ap.add_argument("-p", "--padding", type=float, default=0.0,
 	help="amount of padding to add to each border of ROI")
 args = vars(ap.parse_args())
-path = "/home/hdc/PycharmProjects/untitled/png"
+path = "/home/hdc/PycharmProjects/py3cv4/png"
+file_path = '/home/hdc/PycharmProjects/py3cv4/png/IMG_4158.PNG'
 # hasimage = True
 # while hasimage:
 
@@ -46,8 +47,6 @@ for i in os.listdir(path):
 		image = cv2.resize(image, (newW, newH))
 		(H, W) = image.shape[:2]
 
-
-		#fake_box = [(244, 63, 366, 120), (234, 507, 426, 560), (130, 649, 218, 699), (350, 898, 436, 940)]
 		fake_box = [(244, 63, 366, 120), (234, 507, 426, 560), (304, 590, 396, 620), (350, 898, 436, 940)]
 		# loop over the bounding boxes
 		for (startX, startY, endX, endY) in fake_box:
@@ -63,29 +62,29 @@ for i in os.listdir(path):
 		results = sorted(results, key=lambda r:r[0][1])
 
 
-print(results)
+# print(results)
 print(real_results)
 print(len(real_results)/4)
 # loop over the results
+
+
 # for ((startX, startY, endX, endY), text) in results:
-#
-# 	# display the text OCR'd by Tesseract
-# 	print("OCR TEXT")
-# 	print("========")
-# 	print("{}\n".format(text))
-#
-# 	# strip out non-ASCII text so we can draw the text on the image
-# 	# using OpenCV, then draw the text and a bounding box surrounding
-# 	# the text region of the input image
-# 	text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
-# 	output = orig.copy()
-# 	cv2.rectangle(output, (startX, startY), (endX, endY),
-# 		(0, 0, 255), 2)
-# 	cv2.putText(output, text, (startX, startY - 20),
-# 		cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
-# 	print("we are in startX-{}, startY-{}, endX-{}, endY-{}".format(startX,
-# 													startY, endX, endY))
-# 	# show the output image
-#     cv2.imshow("Text Detection", output)
-#     time.sleep(1)
-# 	# cv2.waitKey(0)
+# display the text OCR'd by Tesseract
+print("OCR TEXT")
+print("========")
+print("{}\n".format(text))
+
+# strip out non-ASCII text so we can draw the text on the image
+# using OpenCV, then draw the text and a bounding box surrounding
+# the text region of the input image
+text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
+output = orig.copy()
+cv2.rectangle(output, (startX, startY), (endX, endY),
+	(0, 0, 255), 2)
+cv2.putText(output, text, (startX, startY - 20),
+	cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+print("we are in startX-{}, startY-{}, endX-{}, endY-{}".format(startX, startY, endX, endY))
+# show the output image
+cv2.imshow("Text Detection", output)
+time.sleep(1)
+# cv2.waitKey(0)
