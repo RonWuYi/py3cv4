@@ -1,5 +1,3 @@
-from imutils.object_detection import non_max_suppression
-import numpy as np
 import pytesseract
 import argparse
 import cv2
@@ -8,21 +6,16 @@ import os
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", type=str,
-	help="path to input image")
-ap.add_argument("-east", "--east", type=str,
-	help="path to input EAST text detector")
+ap.add_argument("-i", "--image", type=str, help="path to input image")
+ap.add_argument("-east", "--east", type=str, help="path to input EAST text detector")
 ap.add_argument("-c", "--min-confidence", type=float, default=0.5,
-	help="minimum probability required to inspect a region")
-ap.add_argument("-w", "--width", type=int, default=320,
-	help="nearest multiple of 32 for resized width")
-ap.add_argument("-e", "--height", type=int, default=320,
-	help="nearest multiple of 32 for resized height")
-ap.add_argument("-p", "--padding", type=float, default=0.0,
-	help="amount of padding to add to each border of ROI")
+				help="minimum probability required to inspect a region")
+ap.add_argument("-w", "--width", type=int, default=320, help="nearest multiple of 32 for resized width")
+ap.add_argument("-e", "--height", type=int, default=320, help="nearest multiple of 32 for resized height")
+ap.add_argument("-p", "--padding", type=float, default=0.0, help="amount of padding to add to each border of ROI")
 args = vars(ap.parse_args())
 path = "/home/hdc/PycharmProjects/py3cv4/png"
-file_path = '/home/hdc/PycharmProjects/py3cv4/png/IMG_4158.PNG'
+file_path = '/home/hdc/PycharmProjects/py3cv4/png/IMG_4156.PNG'
 # hasimage = True
 # while hasimage:
 
