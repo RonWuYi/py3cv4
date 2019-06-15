@@ -1,31 +1,25 @@
 import cv2
+import pytesseract
+# import time
+from PIL import Image
+import os
 
-img = cv2.imread(r'/home/hdc/PycharmProjects/py3cv4/png/IMG_4156.PNG')
-orig = img.copy()
+folder_path = '/home/hdc/PycharmProjects/py3cv4/png/3'
+png_list = os.listdir(folder_path)
 
-startX, startY, endX, endY = 244, 63, 366, 120
-# for (startX, startY, endX, endY) in [(244, 63, 366, 120)]):
-cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
-cv2.imshow("origional", orig)
-cv2.waitKey(0)
-# print(type(img))
-#
-# print(type(orig))
+fix_box3 = [(272, 63, 366, 132), (232, 513, 399, 570), (309, 593, 399, 620), (351, 905, 419, 940)]
 
-# try:
-#     from PIL import Image
-#
-# except ImportError:
-#     import Image
-#
-# import pytesseract
-#
-# tessdata_dir_config = r'--tessdata-dir "/home/hdc/PycharmProjects/py3cv4/data"'
-# # pytesseract.image_to_string(img, lang='en', config=tessdata_dir_config)
-#
-# # If you don't have tesseract executable in your PATH, include the following:
-# pytesseract.pytesseract.tesseract_cmd = r'<full_path_to_your_tesseract_executable>'
-# # Example tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract'
-#
-# # Simple image to string
-# print(pytesseract.image_to_string(img))
+for i in png_list:
+    img = cv2.imread(os.path.join(folder_path, i))
+    orig = img.copy()
+
+    # this is cp area
+    for (startX, startY, endX, endY) in fix_box3:
+        cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
+        cv2.imshow("origional", orig)
+        config = ("-l eng --oem 1 --psm 3")
+        roi = orig[startY:endY, startX:endX]
+        text = pytesseract.image_to_string(roi, config=config)
+        print(text)
+        print(pytesseract.image_to_string(Image.fromarray(roi)))
+        cv2.waitKey(0)
