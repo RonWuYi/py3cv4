@@ -1,8 +1,13 @@
 import cv2
 import pytesseract
-# import time
-from PIL import Image
 import os
+
+from PIL import Image
+from xml.etree.ElementTree import ElementTree
+
+tree = ElementTree()
+tree.parse('/home/hdc/PycharmProjects/py3cv4/xml/result.xml')
+tree.write("output.xml")
 
 folder_path = '/home/hdc/PycharmProjects/py3cv4/png/3'
 png_list = os.listdir(folder_path)
