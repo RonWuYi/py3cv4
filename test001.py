@@ -24,6 +24,10 @@ startXc, startYc, endXc, endYc = 272, 63, 366, 140
 #enlarge
 startXc, startYc, endXc, endYc = 272, 63, 366, 132
 
+# this is cp area for 4
+startXc, startYc, endXc, endYc = 258, 63, 380, 132
+
+fix_box3 = [(258, 63, 380, 132), (232, 513, 379, 570), (309, 593, 379, 620), (347, 905, 419, 940)]
 
 # this is cp area for 2
 startX, startY, endX, endY = 287, 63, 366, 132
