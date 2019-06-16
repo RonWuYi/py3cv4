@@ -1,7 +1,7 @@
 import cv2
 import pytesseract
 import os
-
+import re
 import xml.etree.ElementTree as ET
 
 my_xml = '/home/hdc/PycharmProjects/py3cv4/xml/result.xml'
