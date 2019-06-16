@@ -7,7 +7,6 @@ root = three.getroot()
 
 for i in range(6):
     bug = ET.SubElement(root, 'bug')
-
     name = ET.SubElement(bug, 'name{}'.format(i))
     name.text = "name area {}".format(i)
 
