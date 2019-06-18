@@ -24,6 +24,7 @@ for x, _, z in os.walk(root_folder):
         conn = psycopg2.connect(database="testdb", user="postgres", password="postgres", host="172.16.66.244")
         cur = conn.cursor()
         for i in z:
+            print("start handle {}".format(os.path.join(x, i)))
             if x[-1:] == "2":
                 img = cv2.imread(os.path.join(x, i))
                 orig = img.copy()
@@ -44,6 +45,7 @@ for x, _, z in os.walk(root_folder):
                         hp = re.search(r'[0-9]*', text).group(0)
                     else:
                         dust = re.search(r'[0-9]*', text).group(0)
+                print(cp, name, hp, dust)
                 bug = ET.SubElement(root, 'bug')
                 bug_name = ET.SubElement(bug, 'name')
                 bug_name.text = name
@@ -53,8 +55,12 @@ for x, _, z in os.walk(root_folder):
                 bug_hp.text = hp
                 bug_dust = ET.SubElement(bug, 'dust')
                 bug_dust.text = dust
-                cur.execute("INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",
-                            (name, int(cp), int(hp), int(dust)))
+                try:
+                    cur.execute("INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",
+                                (name, int(cp), int(hp), int(dust)))
+                except ValueError as e:
+                    print(e)
+                    continue
             elif x[-1:] == "3":
                 img = cv2.imread(os.path.join(x, i))
                 orig = img.copy()
@@ -74,6 +80,7 @@ for x, _, z in os.walk(root_folder):
                     else:
                         dust = re.search(r'[0-9]*', text).group(0)
                     # cv2.waitKey(0)
+                print(cp, name, hp, dust)
                 bug = ET.SubElement(root, 'bug')
                 bug_name = ET.SubElement(bug, 'name')
                 bug_name.text = name
@@ -83,8 +90,12 @@ for x, _, z in os.walk(root_folder):
                 bug_hp.text = hp
                 bug_dust = ET.SubElement(bug, 'dust')
                 bug_dust.text = dust
-                cur.execute("INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",
-                            (name, int(cp), int(hp), int(dust)))
+                try:
+                    cur.execute("INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",
+                                (name, int(cp), int(hp), int(dust)))
+                except ValueError as e:
+                    print(e)
+                    continue
             else:
                 img = cv2.imread(os.path.join(x, i))
                 orig = img.copy()
@@ -104,6 +115,7 @@ for x, _, z in os.walk(root_folder):
                     else:
                         dust = re.search(r'[0-9]*', text).group(0)
                     # cv2.waitKey(0)
+                print(cp, name, hp, dust)
                 bug = ET.SubElement(root, 'bug')
                 bug_name = ET.SubElement(bug, 'name')
                 bug_name.text = name
@@ -113,8 +125,12 @@ for x, _, z in os.walk(root_folder):
                 bug_hp.text = hp
                 bug_dust = ET.SubElement(bug, 'dust')
                 bug_dust.text = dust
-                cur.execute("INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",
-                            (name, int(cp), int(hp), int(dust)))
+                try:
+                    cur.execute("INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",
+                                (name, int(cp), int(hp), int(dust)))
+                except ValueError as e:
+                    print(e)
+                    continue
         conn.commit()
         conn.close()
 
