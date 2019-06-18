@@ -1,7 +1,6 @@
 import cv2
 import pytesseract
 import os
-import re
 import xml.etree.ElementTree as ET
 
 my_xml = '/home/hdc/PycharmProjects/py3cv4/xml/result.xml'
@@ -9,6 +8,7 @@ three = ET.parse(my_xml)
 root = three.getroot()
 
 root_folder = '/home/hdc/PycharmProjects/py3cv4/png/'
+config = "-l eng --oem 1 --psm 3"
 
 fix_box2 = [(289, 65, 366, 129), (232, 513, 393, 570), (259, 593, 298, 620), (353, 905, 419, 940)]
 fix_box3 = [(272, 63, 366, 132), (232, 513, 384, 570), (259, 593, 298, 620), (353, 905, 419, 940)]
@@ -25,7 +25,6 @@ for x, _, z in os.walk(root_folder):
                 for (startX, startY, endX, endY) in fix_box2:
                     # cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
                     # cv2.imshow("origional", orig)
-                    config = ("-l eng --oem 1 --psm 3")
                     roi = orig[startY:endY, startX:endX]
                     text = pytesseract.image_to_string(roi, config=config)
                     print(text)
@@ -54,7 +53,7 @@ for x, _, z in os.walk(root_folder):
                 for (startX, startY, endX, endY) in fix_box3:
                     # cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
                     # cv2.imshow("origional", orig)
-                    config = ("-l eng --oem 1 --psm 3")
+
                     roi = orig[startY:endY, startX:endX]
                     text = pytesseract.image_to_string(roi, config=config)
                     print(text)
@@ -82,7 +81,6 @@ for x, _, z in os.walk(root_folder):
                 for (startX, startY, endX, endY) in fix_box4:
                     # cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
                     # cv2.imshow("origional", orig)
-                    config = ("-l eng --oem 1 --psm 3")
                     roi = orig[startY:endY, startX:endX]
                     text = pytesseract.image_to_string(roi, config=config)
                     print(text)
