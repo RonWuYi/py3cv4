@@ -5,6 +5,8 @@ import psycopg2
 import pytesseract
 import xml.etree.ElementTree as ET
 
+from base64.google_picto64II import detect_document
+
 my_xml = '/home/hdc/Downloads/project/py3cv4/xml/result.xml'
 
 three = ET.parse(my_xml)
@@ -102,8 +104,8 @@ for x, _, z in os.walk(root_folder):
                 img = cv2.imread(os.path.join(x, i))
                 orig = img.copy()
                 for (startX, startY, endX, endY) in fix_box4:
-                    cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
-                    cv2.imshow("origional", orig)
+                    # cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
+                    # cv2.imshow("origional", orig)
                     roi = orig[startY:endY, startX:endX]
                     text = pytesseract.image_to_string(roi, config=config)
                     # print(text)
@@ -116,23 +118,26 @@ for x, _, z in os.walk(root_folder):
                         hp = re.search(r'[0-9]*', text).group(0)
                     else:
                         dust = text.replace(',', '')
-                    cv2.waitKey(0)
-                print(cp, name, hp, dust)
-                bug = ET.SubElement(root, 'bug')
-                bug_name = ET.SubElement(bug, 'name')
-                bug_name.text = name
-                bug_cp = ET.SubElement(bug, 'cp')
-                bug_cp.text = cp
-                bug_hp = ET.SubElement(bug, 'hp')
-                bug_hp.text = hp
-                bug_dust = ET.SubElement(bug, 'dust')
-                bug_dust.text = dust
-                try:
-                    cur.execute("INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",
-                                (name, int(cp), int(hp), int(dust)))
-                except ValueError as e:
-                    print(e)
-                    continue
+                    # cv2.waitKey(0)
+                if all(v is not None for v in [cp, name, hp, dust]):
+                    print(cp, name, hp, dust)
+                    bug = ET.SubElement(root, 'bug')
+                    bug_name = ET.SubElement(bug, 'name')
+                    bug_name.text = name
+                    bug_cp = ET.SubElement(bug, 'cp')
+                    bug_cp.text = cp
+                    bug_hp = ET.SubElement(bug, 'hp')
+                    bug_hp.text = hp
+                    bug_dust = ET.SubElement(bug, 'dust')
+                    bug_dust.text = dust
+                    try:
+                        cur.execute("INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",
+                                    (name, int(cp), int(hp), int(dust)))
+                    except ValueError as e:
+                        print(e)
+                        continue
+                else:
+                    detect_document(os.path.join(x, i))
         conn.commit()
         conn.close()
 
