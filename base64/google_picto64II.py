@@ -1,4 +1,5 @@
 import io
+import os
 
 
 def detect_document(path):
@@ -31,3 +32,9 @@ def detect_document(path):
                     for symbol in word.symbols:
                         print('\tSymbol: {} (confidence: {})'.format(
                             symbol.text, symbol.confidence))
+
+
+if __name__ == '__main__':
+    os.system('export GOOGLE_APPLICATION_CREDENTIALS='
+              '/home/hdc/Downloads/project/py3cv4/jsonKey/lyshmily-457c5c843982.json')
+    detect_document('/home/hdc/Downloads/project/py3cv4/png/2/IMG_5184.PNG')
