@@ -37,9 +37,9 @@ def detect_document(path):
 
     response = client.document_text_detection(image=image)
 
-    x = []
+    my_list = []
     for page in response.full_text_annotation.text:
-        x.append(page)
+        my_list.append(page)
         # print(page.text)
 
         # for block in page.blocks:
@@ -61,22 +61,57 @@ def detect_document(path):
         #             for symbol in word.symbols:
         #                 print('\tSymbol: {} (confidence: {})'.format(
         #                     symbol.text, symbol.confidence))
-    print("#######################################################################################")
-    print(x)
-    print("#######################################################################################")
-    print(''.join(x))
-    print(len(x))
-    print("#######################################################################################")
-    # pprint(str(response))
-    # # data = json.loads(str(response))
-    # with open(os.path.join('/home/hdc/Downloads/project/py3cv4/jsonData', 'data2.json'), 'w') as f:
-    #     json.dump(json.load(str(response)), f)
 
-    # with open(os.path.join('/home/hdc/Downloads/project/py3cv4/jsonData', 'testdata.txt'), 'w') as f:
-    #     f.write(str(response))
-    # for k, v in json.loads(str(response)):
-    #     if k == "fullTextAnnotation":
-    #         print(v)
+    # print(my_list)
+    # print("#######################################################################################")
+    print(''.join(my_list))
+    print("#######################################################################################")
+    cp = []
+    name = []
+    hp = []
+    dust = []
+
+    for idx, val in enumerate(my_list):
+        if val == 'C' and my_list[idx + 1] == 'P':
+            for idx1, val1 in enumerate(my_list[idx + 2:]):
+                if val1 != '\n':
+                    cp.append(val1)
+                else:
+                    flag = 0
+                    for idx2, val2 in enumerate(my_list[idx + idx1 + 2:]):
+                        if val2 != '\n':
+                            name.append(val2)
+                        else:
+                            flag += 1
+                            if flag == 2:
+                                for idx3, val3 in enumerate(my_list[idx + idx1 + idx2 + 3:]):
+                                    if val3 != '\n' and val3 != ' ' and val3 != '/':
+                                        hp.append(val3)
+                                    elif val3 == ' ' and my_list[idx + idx1 + idx2 + idx3 + 2] == '/':
+                                        break
+                                break
+                            else:
+                                continue
+                    break
+
+            break
+
+    print(''.join(cp))
+    print(''.join(name))
+    print(''.join(hp))
+
+    # print(len(x))
+    # print("#######################################################################################")
+    # # pprint(str(response))
+    # # # data = json.loads(str(response))
+    # # with open(os.path.join('/home/hdc/Downloads/project/py3cv4/jsonData', 'data2.json'), 'w') as f:
+    # #     json.dump(json.load(str(response)), f)
+    #
+    # # with open(os.path.join('/home/hdc/Downloads/project/py3cv4/jsonData', 'testdata.txt'), 'w') as f:
+    # #     f.write(str(response))
+    # # for k, v in json.loads(str(response)):
+    # #     if k == "fullTextAnnotation":
+    # #         print(v)
 
 
 if __name__ == '__main__':
