@@ -5,7 +5,7 @@ import os
 from google.cloud import vision
 from google.cloud.vision import types
 from pprint import pprint
-
+root_path = '/home/hdc/Downloads/project/py3cv4/png'
 path = '/home/hdc/Downloads/project/py3cv4/png/2/IMG_5183.PNG'
 
 key_path = '/home/hdc/Downloads/project/py3cv4/jsonKey/lyshmily-457c5c843982.json'
@@ -61,8 +61,11 @@ def detect_document(path):
         #             for symbol in word.symbols:
         #                 print('\tSymbol: {} (confidence: {})'.format(
         #                     symbol.text, symbol.confidence))
-    print("#######################################################################################")    
+    print("#######################################################################################")
+    print(x)
+    print("#######################################################################################")
     print(''.join(x))
+    print(len(x))
     print("#######################################################################################")
     # pprint(str(response))
     # # data = json.loads(str(response))
@@ -82,4 +85,7 @@ if __name__ == '__main__':
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_path
     # os.system('echo $GOOGLE_APPLICATION_CREDENTIALS')
     # print(os.environ)
-    detect_document(path)
+    for x, _, z in os.walk(root_path):
+        if len(z) > 0:
+            for i in z:
+                detect_document(os.path.join(x, i))
