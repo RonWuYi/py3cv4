@@ -11,18 +11,22 @@ path = '/home/hdc/Downloads/project/py3cv4/png/2/IMG_5183.PNG'
 key_path = '/home/hdc/Downloads/project/py3cv4/jsonKey/lyshmily-457c5c843982.json'
 
 
-def method():
+def method(file_name):
     client = vision.ImageAnnotatorClient()
-    file_name = '/home/hdc/Downloads/project/py3cv4/png/2/IMG_5183.PNG'
+    # file_name = '/home/hdc/Downloads/project/py3cv4/png/2/IMG_5183.PNG'
     # file_name = os.path.join()
     with io.open(file_name, 'rb') as image_file:
         content = image_file.read()
     image = types.Image(content=content)
     response = client.document_text_detection(image=image)
     labels = response.full_text_annotation
-    print('texts:')
-    for text in labels:
-        print(text.description)
+    # print('texts:')
+    # for text in labels:
+    #     print(text.description)
+    my_list = []
+    for page in response.full_text_annotation.text:
+        my_list.append(page)
+    print(my_list)
 
 
 def detect_document(path):
@@ -64,30 +68,74 @@ def detect_document(path):
 
     # print(my_list)
     # print("#######################################################################################")
-    print(''.join(my_list))
-    print("#######################################################################################")
+    # print(''.join(my_list))
+
     cp = []
     name = []
     hp = []
     dust = []
+    # number_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    # for idx, val in enumerate(my_list):
+    #     if val == 'C' and my_list[idx + 1] == 'P':
+    #         for idx1, val1 in enumerate(my_list[idx + 2:]):
+    #             if val1 != '\n':
+    #                 cp.append(val1)
+    #             else:
+    #                 flag = 0
+    #                 for idx2, val2 in enumerate(my_list[idx + idx1 + 2:]):
+    #                     if val2 != '\n':
+    #                         name.append(val2)
+    #                     else:
+    #                         flag += 1
+    #                         if flag == 2:
+    #                             for idx3, val3 in enumerate(my_list[idx + idx1 + idx2 + 3:]):
+    #                                 if val3 != '\n' and val3 != ' ' and val3 != '/':
+    #                                     hp.append(val3)
+    #                                 elif val3 == ' ' and my_list[idx + idx1 + idx2 + idx3 + 2] == '/':
+    #                                     break
+    #                             break
+    #                         else:
+    #                             continue
+    #                 break
+    #
+    #         break
 
     for idx, val in enumerate(my_list):
         if val == 'C' and my_list[idx + 1] == 'P':
             for idx1, val1 in enumerate(my_list[idx + 2:]):
-                if val1 != '\n':
+                if val1.isdigit():
                     cp.append(val1)
                 else:
                     flag = 0
                     for idx2, val2 in enumerate(my_list[idx + idx1 + 2:]):
-                        if val2 != '\n':
+                        if val2.isalpha():
                             name.append(val2)
                         else:
                             flag += 1
                             if flag == 2:
                                 for idx3, val3 in enumerate(my_list[idx + idx1 + idx2 + 3:]):
-                                    if val3 != '\n' and val3 != ' ' and val3 != '/':
+                                    # if val3 != '\n' and val3 != ' ' and val3 != '/':
+                                    if val3.isdigit():
                                         hp.append(val3)
                                     elif val3 == ' ' and my_list[idx + idx1 + idx2 + idx3 + 2] == '/':
+                                        new_lsit = my_list[idx + idx1 + idx2 + idx3 + 3:]
+                                        for idx4, val4 in enumerate(my_list[idx + idx1 + idx2 + idx3 + 3:]):
+                                            if val4 == ' ' and new_lsit[idx4 + 1] == 'U' and new_lsit[idx4 + 2] == 'P':
+                                                flagI = 0
+                                                for idx5, val5 in enumerate(my_list[idx + idx1 +
+                                                                                    idx2 + idx3 + idx4 + 3 + 2 + 1:]):
+                                                    # if val5 != '\n' and val5 != ',':
+                                                    if val5.isdigit():
+                                                        dust.append(val5)
+                                                    else:
+                                                        flagI += 1
+                                                        if flagI >= 3:
+                                                            break
+                                                        else:
+                                                            continue
+                                                # pass]
+                                                # break
+                                                break
                                         break
                                 break
                             else:
@@ -95,13 +143,16 @@ def detect_document(path):
                     break
 
             break
-
+    print("#######################################################################################")
+    if len(cp) == 0 or len(name) == 0 or len(hp) == 0 or len(dust) == 0:
+        print(my_list)
+    print("***************************************************************************************")
     print(''.join(cp))
     print(''.join(name))
     print(''.join(hp))
-
+    print(''.join(dust))
     # print(len(x))
-    # print("#######################################################################################")
+    print("#######################################################################################")
     # # pprint(str(response))
     # # # data = json.loads(str(response))
     # # with open(os.path.join('/home/hdc/Downloads/project/py3cv4/jsonData', 'data2.json'), 'w') as f:
@@ -123,4 +174,5 @@ if __name__ == '__main__':
     for x, _, z in os.walk(root_path):
         if len(z) > 0:
             for i in z:
+                print("we are working on {}".format(os.path.join(x, i)))
                 detect_document(os.path.join(x, i))
