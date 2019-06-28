@@ -42,8 +42,7 @@ def detect_document(path):
     for page in response.full_text_annotation.text:
         my_list.append(page)
     new_list = [x for x in my_list if x in string.ascii_letters or x in string.octdigits or x == '/']
-    print(new_list)
-
+    # print(new_list)
     for idx, val in enumerate(new_list):
         if val == 'C' and new_list[idx + 1] == 'P':
             for idx1, val1 in enumerate(new_list[idx + 2:]):
@@ -76,25 +75,21 @@ def detect_document(path):
                                         elif len(dust) > 0:
                                             break
                                     break
-                                # break
-                        # break
-
                 elif len(name) > 0:
                     break
         elif len(cp) == 0 or len(name) == 0 or len(hp) == 0 or len(dust) == 0:
             continue
         elif len(cp) > 0 and len(name) > 0 and len(hp) > 0 and len(dust) > 0:
             break
-        # elif len(cp) == 0:
-        #     continue
-        # elif len(cp) > 0:
-        #     break
-    print("***************************************************************************************")
-    print(''.join(cp))
-    print(''.join(name))
-    print(''.join(hp))
-    print(''.join(dust))
-    print("#######################################################################################")
+
+    # print("***************************************************************************************")
+    # print(''.join(cp))
+    # print(''.join(name))
+    # print(''.join(hp))
+    # print(''.join(dust))
+    # print("#######################################################################################")
+
+    return [''.join(cp), ''.join(name), ''.join(hp), ''.join(dust)]
 
 
 if __name__ == '__main__':
