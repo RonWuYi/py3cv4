@@ -3,7 +3,6 @@ import re
 import cv2
 import pytesseract
 
-from PIL import Image
 from googlebase64 import gcpIII
 from util.PyConstant import *
 from db.PsyDb import Database
@@ -22,15 +21,19 @@ def img_show(start_x, start_y, end_x, end_y, orig, flag):
 
 def print_values(my_list, flag):
     if flag:
-        for i in my_list:
-            print(i)
+        if len(my_list) > 0:
+            print(input_file for input_file in my_list)
+            # for i in my_list:
+            #     print(i)
+        else:
+            pass
     else:
         pass
 
 
-def read_detection(file, box, debug=True, cv_config=psm3_config):
+def read_detection(input_file, box, debug=True, cv_config=psm3_config):
     new_value_list = []
-    img = cv2.imread(file)
+    img = cv2.imread(input_file)
     orig = img.copy()
     for (startX, startY, endX, endY) in box:
         img_show(startX, startY, endX, endY, orig, debug)
@@ -38,47 +41,61 @@ def read_detection(file, box, debug=True, cv_config=psm3_config):
         text = pytesseract.image_to_string(roi, config=cv_config)
         if debug:
             print(text)
-            print(pytesseract.image_to_string(Image.fromarray(roi)))
         else:
             pass
         if box.index((startX, startY, endX, endY)) == 0:
-            # cp = text
-            cp = re.search(r'[0-9]*', text).group(0)
-            new_value_list.append(cp)
+            bug_cp = re.search(r'[0-9]*', text).group(0)
+            if len(bug_cp) > 0:
+                new_value_list.append(bug_cp)
+            else:
+                new_value_list.append('0')
         elif box.index((startX, startY, endX, endY)) == 1:
-            name = re.search(r'[a-z.A-Z]*', text).group(0)
-            new_value_list.append(name)
+            bug_name = re.search(r'[a-z.A-Z]*', text).group(0)
+            if len(bug_name) > 0:
+                new_value_list.append(bug_name)
+            else:
+                new_value_list.append('empty')
         elif box.index((startX, startY, endX, endY)) == 2:
-            hp = re.search(r'[0-9]*', text).group(0)
-            new_value_list.append(hp)
+            bug_hp = re.search(r'[0-9]*', text).group(0)
+            if len(bug_hp) > 0:
+                new_value_list.append(bug_hp)
+            else:
+                new_value_list.append('0')
         else:
-            dust = re.search(r'[0-9]*', text).group(0)
-            new_value_list.append(dust)
+            bug_dust = re.search(r'[0-9]*', text).group(0)
+            if len(bug_dust) > 0:
+                new_value_list.append(bug_dust)
+            else:
+                new_value_list.append('0')
     if len(new_value_list[0]) > 0 and len(new_value_list[1]) > 0 \
             and len(new_value_list[2]) > 0 and len(new_value_list[3]) > 0:
         pass
-    elif len(new_value_list[0]) > 0 and len(new_value_list[1]) > 0 \
-            and len(new_value_list[2]) > 0 and len(new_value_list[3]) > 0:
-        value_list = gcpIII.detect_document(os.path.join(x, i))
+    elif len(new_value_list[0]) == 0 or len(new_value_list[1]) == 0 \
+            or len(new_value_list[2]) == 0 or len(new_value_list[3]) == 0:
+        value_list = gcpIII.detect_document(input_file)
         for idx, value in enumerate(new_value_list):
             if len(value) == 0 and idx == 0:
                 if len(value_list[0]) >= 6:
-                    cp = value_list[0][:3]
+                    bug_cp = value_list[0][:3]
                 else:
-                    cp = value_list[0]
-                new_value_list[0] = cp
+                    bug_cp = value_list[0]
+                if len(bug_cp) > 0:
+                    new_value_list[0] = bug_cp
             elif len(value) == 0 and idx == 1:
-                name = value_list[1]
-                new_value_list[1] = name
+                bug_name = value_list[1]
+                if len(bug_name) > 0:
+                    new_value_list[1] = bug_name
             elif len(value) == 0 and idx == 2:
-                hp = value_list[2]
-                new_value_list[2] = hp
+                bug_hp = value_list[2]
+                if len(bug_hp) > 0:
+                    new_value_list[2] = bug_hp
             elif len(value) == 0 and idx == 0:
                 if value_list[3] >= 5:
-                    dust = value_list[3][1:4]
+                    bug_dust = value_list[3][1:4]
                 else:
-                    dust = value_list[3][1:3]
-                new_value_list[3] = dust
+                    bug_dust = value_list[3][1:3]
+                if len(bug_dust) > 0:
+                    new_value_list[3] = bug_dust
     print_values(new_value_list, debug)
     my_db.execute(insert_into_bugs, (new_value_list[1], int(new_value_list[0]),
                                      int(new_value_list[2]), int(new_value_list[3])))
@@ -92,13 +109,13 @@ def walk_folder(path):
     sub_list2 = []
     for x, _, z in os.walk(path):
         if len(z) > 0:
-            for i in z:
+            for input_file in z:
                 if x[-1:] == "2":
-                    sub_list0.append(os.path.join(x, i))
+                    sub_list0.append(os.path.join(x, input_file))
                 elif x[-1:] == "3":
-                    sub_list1.append(os.path.join(x, i))
+                    sub_list1.append(os.path.join(x, input_file))
                 else:
-                    sub_list2.append(os.path.join(x, i))
+                    sub_list2.append(os.path.join(x, input_file))
     file_list.append(sub_list0)
     file_list.append(sub_list1)
     file_list.append(sub_list2)
@@ -111,12 +128,10 @@ if __name__ == '__main__':
         if len(i) > 0:
             if walk_folder(root_folder).index(i) == 0:
                 for file in i:
-                    read_detection(file, fix_box2)
+                    read_detection(file, fix_box2, debug=false_flag)
             elif walk_folder(root_folder).index(i) == 1:
                 for file in i:
                     read_detection(file, fix_box3)
             elif walk_folder(root_folder).index(i) == 1:
                 for file in i:
-                    read_detection(file, fix_box4)
-
-
+                    read_detection(file, fix_box4, debug=false_flag)
