@@ -123,9 +123,11 @@ def read_detection2(input_file, box, debug=True, config1=None, config2=None):
     new_value_list = []
     img = cv2.imread(input_file)
     orig = img.copy()
+    # print(type(orig))
     for (startX, startY, endX, endY) in box:
         img_show(startX, startY, endX, endY, orig, debug)
         roi = orig[startY:endY, startX:endX]
+        # print(type(roi))
         # text = pytesseract.image_to_string(roi, config=tesseract_config)
 
         if box.index((startX, startY, endX, endY)) == 0:
@@ -141,6 +143,11 @@ def read_detection2(input_file, box, debug=True, config1=None, config2=None):
             # else:
             #     new_value_list.append('0')
             bug_cp = ''.join(cur_list)
+            # if len(bug_cp) == 0:
+                # cv2.rectangle(orig, (start_x, start_y), (end_x, end_y), (0, 255, 0), 2)
+            # cv2.imshow("origional", roi)
+            # cv2.waitKey(0)
+
             new_value_list.append(bug_cp)
         elif box.index((startX, startY, endX, endY)) == 1:
             cur_list = []
@@ -262,7 +269,7 @@ if __name__ == '__main__':
             if walk_folder(root_home).index(i) == 0:
                 for file in i:
                     read_detection2(input_file=file, box=fix_box2, debug=true_flag,
-                                    config1=psm7_config_number, config2=psm8_config_words)
+                                    config1=psm1_config_number, config2=psm8_config_words2)
                 # my_db.commit()
             elif walk_folder(root_home).index(i) == 1:
                 for file in i:
