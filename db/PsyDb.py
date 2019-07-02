@@ -38,4 +38,5 @@ class Database:
         return self.fetchall()
 
     def exit(self):
-        self.__exit__()
+        self.commit()
+        self.connection.close()

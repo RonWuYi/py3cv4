@@ -7,8 +7,6 @@ from googlebase64 import gcpIII
 from util.PyConstant import *
 from db.PsyDb import Database
 
-my_db = Database(database, user, password, host)
-
 
 def img_show(start_x, start_y, end_x, end_y, orig, flag):
     if flag:
@@ -31,47 +29,61 @@ def print_values(my_list, flag):
         pass
 
 
-def read_detection(input_file, box, debug=True, cv_config=psm3_config):
+def read_detection(db, input_file, box, debug=True, tesseract_config1=None, tesseract_config2=None):
     new_value_list = []
     img = cv2.imread(input_file)
     orig = img.copy()
     for (startX, startY, endX, endY) in box:
         img_show(startX, startY, endX, endY, orig, debug)
         roi = orig[startY:endY, startX:endX]
-        text = pytesseract.image_to_string(roi, config=cv_config)
+        # text = pytesseract.image_to_string(roi, config=tesseract_config)
+
+        if box.index((startX, startY, endX, endY)) == 0:
+            text = pytesseract.image_to_string(roi, config=tesseract_config1)
+            bug_cp = re.search(r'[0-9]*', text).group(0)
+            # if len(bug_cp) > 0:
+            #     new_value_list.append(bug_cp)
+            # else:
+            #     new_value_list.append('0')
+            new_value_list.append(bug_cp)
+        elif box.index((startX, startY, endX, endY)) == 1:
+            text = pytesseract.image_to_string(roi, config=tesseract_config2)
+            bug_name = re.search(r'[a-z.A-Z]*', text).group(0)
+            # if len(bug_name) > 0:
+            #     new_value_list.append(bug_name)
+            # else:
+            #     new_value_list.append('empty')
+            new_value_list.append(bug_name)
+        elif box.index((startX, startY, endX, endY)) == 2:
+            text = pytesseract.image_to_string(roi, config=tesseract_config1)
+            bug_hp = re.search(r'[0-9]*', text).group(0)
+            # if len(bug_hp) > 0:
+            #     new_value_list.append(bug_hp)
+            # else:
+            #     new_value_list.append('0')
+            new_value_list.append(bug_hp)
+        else:
+            # bug_dust = re.search(r'[0-9]*', text).group(0)
+            text = pytesseract.image_to_string(roi, config=tesseract_config1)
+            bug_dust = text.replace(',', '')
+            # if len(bug_dust) > 0:
+            #     new_value_list.append(bug_dust)
+            # else:
+            #     new_value_list.append('0')
+            new_value_list.append(bug_dust)
         if debug:
-            print(text)
+            print(new_value_list)
         else:
             pass
-        if box.index((startX, startY, endX, endY)) == 0:
-            bug_cp = re.search(r'[0-9]*', text).group(0)
-            if len(bug_cp) > 0:
-                new_value_list.append(bug_cp)
-            else:
-                new_value_list.append('0')
-        elif box.index((startX, startY, endX, endY)) == 1:
-            bug_name = re.search(r'[a-z.A-Z]*', text).group(0)
-            if len(bug_name) > 0:
-                new_value_list.append(bug_name)
-            else:
-                new_value_list.append('empty')
-        elif box.index((startX, startY, endX, endY)) == 2:
-            bug_hp = re.search(r'[0-9]*', text).group(0)
-            if len(bug_hp) > 0:
-                new_value_list.append(bug_hp)
-            else:
-                new_value_list.append('0')
-        else:
-            bug_dust = re.search(r'[0-9]*', text).group(0)
-            if len(bug_dust) > 0:
-                new_value_list.append(bug_dust)
-            else:
-                new_value_list.append('0')
     if len(new_value_list[0]) > 0 and len(new_value_list[1]) > 0 \
             and len(new_value_list[2]) > 0 and len(new_value_list[3]) > 0:
         pass
-    elif len(new_value_list[0]) == 0 or len(new_value_list[1]) == 0 \
-            or len(new_value_list[2]) == 0 or len(new_value_list[3]) == 0:
+    # elif len(new_value_list[0]) == 0 or len(new_value_list[1]) == 0 \
+    #         or len(new_value_list[2]) == 0 or len(new_value_list[3]) == 0:
+    elif '' in new_value_list:
+        # if debug:
+        #     print("call google api")
+        print("call google api")
         value_list = gcpIII.detect_document(input_file)
         for idx, value in enumerate(new_value_list):
             if len(value) == 0 and idx == 0:
@@ -97,8 +109,11 @@ def read_detection(input_file, box, debug=True, cv_config=psm3_config):
                 if len(bug_dust) > 0:
                     new_value_list[3] = bug_dust
     print_values(new_value_list, debug)
-    my_db.execute(insert_into_bugs, (new_value_list[1], int(new_value_list[0]),
-                                     int(new_value_list[2]), int(new_value_list[3])))
+    try:
+        db.execute(insert_into_bugs, (new_value_list[1], int(new_value_list[0]),
+                                      int(new_value_list[2]), int(new_value_list[3])))
+    except Exception as e:
+        print(e)
     return new_value_list
 
 
@@ -124,14 +139,21 @@ def walk_folder(path):
 
 if __name__ == '__main__':
     os.environ[GOOGLE_APPLICATION_CREDENTIALS] = key_path
+    my_db = Database(database, user, password, host)
     for i in walk_folder(root_folder):
         if len(i) > 0:
             if walk_folder(root_folder).index(i) == 0:
                 for file in i:
-                    read_detection(file, fix_box2, debug=false_flag)
+                    read_detection(db=my_db, input_file=file, box=fix_box2, debug=true_flag,
+                                   tesseract_config1=psm7_config_number, tesseract_config2=psm7_config_words)
+                my_db.commit()
             elif walk_folder(root_folder).index(i) == 1:
                 for file in i:
-                    read_detection(file, fix_box3)
+                    read_detection(db=my_db, input_file=file, box=fix_box3, debug=true_flag)
+                my_db.commit()
             elif walk_folder(root_folder).index(i) == 1:
                 for file in i:
-                    read_detection(file, fix_box4, debug=false_flag)
+                    read_detection(db=my_db, input_file=file, box=fix_box4, debug=true_flag)
+                my_db.commit()
+    # my_db.commit()
+    my_db.exit()
