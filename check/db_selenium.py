@@ -91,6 +91,46 @@ def do_calculation(name="Buneary", cp="503", hp="80", dust="1600"):
     # input_element.submit()
     time.sleep(1)
 
+    new_rate = check_results()
+
+    name, cp, hp, dust = i[0], str(i[1]), str(i[2]), str(i[3])
+
+    cur.execute(insert_into_results, (name, cp, dust, new_rate))
+    cur.commite
+
+    if new_rate > 0.89:
+        print(new_rate)
+    else:
+        pass
+
+
+def check_results():
+    my_value_max = driver.find_element_by_id("possibleCombinationsStringmax")
+    my_value_avg = driver.find_element_by_id("possibleCombinationsStringavg")
+    my_value_min = driver.find_element_by_id("possibleCombinationsStringmin")
+    # print(my_value.text)
+    # for elem in my_value:
+    #     print(elem.text)
+    max_rate = my_value_max.text[my_value_max.text.index(":") + 2:]
+    print(my_value_max.text[my_value_max.text.index(":") + 2:])
+    print(type(my_value_max.text[my_value_max.text.index(":") + 2:]))
+    # print(int(my_value.text[my_value.text.index(":")+2:]))
+    new_max_rate = float(max_rate.strip('%')) / 100.0
+
+    avg_rate = my_value_avg.text[my_value_avg.text.index(":") + 2:]
+    print(my_value_avg.text[my_value_avg.text.index(":") + 2:])
+    print(type(my_value_avg.text[my_value_avg.text.index(":") + 2:]))
+    # print(int(my_value.text[my_value.text.index(":")+2:]))
+    new_avg_rate = float(avg_rate.strip('%')) / 100.0
+
+    min_rate = my_value_min.text[my_value_min.text.index(":") + 2:]
+    print(my_value_min.text[my_value_min.text.index(":") + 2:])
+    print(type(my_value_min.text[my_value_min.text.index(":") + 2:]))
+    # print(int(my_value.text[my_value.text.index(":")+2:]))
+    new_min_rate = float(min_rate.strip('%')) / 100.0
+
+    return [new_max_rate, new_avg_rate, new_min_rate]
+
 
 conn = psycopg2.connect(database="testdb", user="postgres", password="postgres", host="172.16.66.244")
 cur = conn.cursor()

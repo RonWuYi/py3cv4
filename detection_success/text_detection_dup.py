@@ -1,5 +1,4 @@
 import os
-import re
 import cv2
 import pytesseract
 
@@ -7,6 +6,17 @@ from googlebase64 import gcpIII
 from util.PyConstant import *
 from db.PsyDb import Database
 from pathlib import Path
+
+import time
+import pyautogui
+
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+
+driver = webdriver.Firefox()
+driver.maximize_window()
+driver.get("https://pokeassistant.com/main/ivcalculator")
+insert_into_results = "INSERT INTO results (name, cp, hp, max_rat) VALUES (%s, %s, %s, %s)"
 
 
 def img_show(start_x, start_y, end_x, end_y, orig, flag):
@@ -54,72 +64,7 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
             bug_cp = value_list
             print(bug_cp)
             new_value_list.append(bug_cp)
-            # for idx, value in enumerate(new_value_list):
-            #     if len(value) == 0 and idx == 0:
-            #         if len(value_list[0]) >= 6:
-            #             bug_cp = value_list[0][:3]
-            #         else:
-            #             bug_cp = value_list[0]
-            #         if len(bug_cp) > 0:
-            #             new_value_list[0] = bug_cp
-                # elif len(value) == 0 and idx == 1:
-                #     bug_name = value_list[1]
-                #     if len(bug_name) > 0:
-                #         new_value_list[1] = bug_name
-                # elif len(value) == 0 and idx == 2:
-                #     bug_hp = value_list[2]
-                #     if len(bug_hp) > 0:
-                #         new_value_list[2] = bug_hp
-                # elif len(value) == 0 and idx == 0:
-                #     if value_list[3] >= 5:
-                #         bug_dust = value_list[3][1:4]
-                #     else:
-                #         bug_dust = value_list[3][1:3]
-                #     if len(bug_dust) > 0:
-                #         new_value_list[3] = bug_dust
-                #
 
-
-
-            # tmp_list1 = []
-            # tmp_list2 = []
-            # tmp_list3 = []
-            # text = pytesseract.image_to_string(roi, config=tesseract_config1)
-            # for i in text:
-            #     if i.isnumeric():
-            #         tmp_list1.append(i)
-            # bug_cp = ''.join(tmp_list1)
-            #
-            # # bug_cp = re.search(r'[0-9]*', text).group(0)
-            # if len(bug_cp) == cpleng:
-            #     print(bug_cp)
-            #     new_value_list.append(bug_cp)
-            # else:
-            #     cv2.imwrite(tmp_filename, roi)
-            #     img_show_block(roi, True)
-            #     value_list = gcpIII.single_detect(os.path.join(str(Path.cwd()), tmp_filename))
-            #     print(value_list)
-            #     os.remove(os.path.join(str(Path.cwd()), tmp_filename))
-            #     for i in value_list:
-            #         if i.isnumeric():
-            #             tmp_list2.append(i)
-            #     bug_cp = ''.join(tmp_list2)
-            #     if len(bug_cp) == cpleng:
-            #         print(bug_cp)
-            #         new_value_list.append(bug_cp)
-            #     else:
-            #         roi = old_orig[startY:endY, startX:endX]
-            #         cv2.imwrite(second_tmp_filename, roi)
-            #         img_show_block(roi, True)
-            #         value_list = gcpIII.single_detect(os.path.join(str(Path.cwd()), second_tmp_filename))
-            #         print(value_list)
-            #         os.remove(os.path.join(str(Path.cwd()), second_tmp_filename))
-            #         for i in value_list:
-            #             if i.isnumeric():
-            #                 tmp_list3.append(i)
-            #         bug_cp = ''.join(tmp_list3)
-            #         new_value_list.append(bug_cp)
-            #         print(bug_cp)
         elif box.index((startX, startY, endX, endY)) == 1:
 
             tmp_list1 = []
@@ -129,8 +74,6 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
                 if i.isalpha():
                     tmp_list1.append(i)
             bug_name = ''.join(tmp_list1)
-
-            # bug_cp = re.search(r'[0-9]*', text).group(0)
 
             if len(bug_name) > 0:
                 print(bug_name)
@@ -146,10 +89,6 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
                 new_value_list.append(bug_name)
                 print(bug_name)
 
-            # text = pytesseract.image_to_string(roi, config=tesseract_config2)
-            # print(text)
-            # bug_name = re.search(r'[a-z.A-Z]*', text).group(0)
-            # new_value_list.append(bug_name)
         elif box.index((startX, startY, endX, endY)) == 2:
 
             tmp_list1 = []
@@ -176,10 +115,6 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
                 new_value_list.append(bug_hp)
                 print(bug_hp)
 
-            # text = pytesseract.image_to_string(roi, config=tesseract_config1)
-            # print(text)
-            # bug_hp = re.search(r'[0-9]*', text).group(0)
-            # new_value_list.append(bug_hp)
         else:
 
             tmp_list1 = []
@@ -189,8 +124,6 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
                 if i.isnumeric():
                     tmp_list1.append(i)
             bug_dust = ''.join(tmp_list1)
-
-            # bug_cp = re.search(r'[0-9]*', text).group(0)
 
             if len(bug_dust) > 0:
                 print(bug_dust)
@@ -206,42 +139,9 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
                 new_value_list.append(bug_dust)
                 print(bug_dust)
 
-            # text = pytesseract.image_to_string(roi, config=tesseract_config1)
-            # print(text)
-            # bug_dust = text.replace(',', '')
-            # new_value_list.append(bug_dust)
         if debug:
             print(new_value_list)
     print("####################################################################################")
-    # if len(new_value_list[0]) > 0 and len(new_value_list[1]) > 0 \
-    #         and len(new_value_list[2]) > 0 and len(new_value_list[3]) > 0:
-    #     pass
-    # elif '' in new_value_list:
-    #     value_list = gcpIII.detect_document(input_file)
-    #     for idx, value in enumerate(new_value_list):
-    #         if len(value) == 0 and idx == 0:
-    #             if len(value_list[0]) >= 6:
-    #                 bug_cp = value_list[0][:3]
-    #             else:
-    #                 bug_cp = value_list[0]
-    #             if len(bug_cp) > 0:
-    #                 new_value_list[0] = bug_cp
-    #         elif len(value) == 0 and idx == 1:
-    #             bug_name = value_list[1]
-    #             if len(bug_name) > 0:
-    #                 new_value_list[1] = bug_name
-    #         elif len(value) == 0 and idx == 2:
-    #             bug_hp = value_list[2]
-    #             if len(bug_hp) > 0:
-    #                 new_value_list[2] = bug_hp
-    #         elif len(value) == 0 and idx == 0:
-    #             if value_list[3] >= 5:
-    #                 bug_dust = value_list[3][1:4]
-    #             else:
-    #                 bug_dust = value_list[3][1:3]
-    #             if len(bug_dust) > 0:
-    #                 new_value_list[3] = bug_dust
-    # print_values(new_value_list, debug)
     try:
         db.execute(insert_into_bugs, (new_value_list[1], int(new_value_list[0]),
                                       int(new_value_list[2]), int(new_value_list[3])))
@@ -272,6 +172,78 @@ def walk_folder(path):
     return file_list
 
 
+def check_results():
+    my_value_max = driver.find_element_by_id("possibleCombinationsStringmax")
+    my_value_avg = driver.find_element_by_id("possibleCombinationsStringavg")
+    my_value_min = driver.find_element_by_id("possibleCombinationsStringmin")
+    # print(my_value.text)
+    # for elem in my_value:
+    #     print(elem.text)
+    max_rate = my_value_max.text[my_value_max.text.index(":") + 2:]
+    print(my_value_max.text[my_value_max.text.index(":") + 2:])
+    print(type(my_value_max.text[my_value_max.text.index(":") + 2:]))
+    # print(int(my_value.text[my_value.text.index(":")+2:]))
+    new_max_rate = float(max_rate.strip('%')) / 100.0
+
+    avg_rate = my_value_avg.text[my_value_avg.text.index(":") + 2:]
+    print(my_value_avg.text[my_value_avg.text.index(":") + 2:])
+    print(type(my_value_avg.text[my_value_avg.text.index(":") + 2:]))
+    # print(int(my_value.text[my_value.text.index(":")+2:]))
+    new_avg_rate = float(avg_rate.strip('%')) / 100.0
+
+    min_rate = my_value_min.text[my_value_min.text.index(":") + 2:]
+    print(my_value_min.text[my_value_min.text.index(":") + 2:])
+    print(type(my_value_min.text[my_value_min.text.index(":") + 2:]))
+    # print(int(my_value.text[my_value.text.index(":")+2:]))
+    new_min_rate = float(min_rate.strip('%')) / 100.0
+
+    return [new_max_rate, new_avg_rate, new_min_rate]
+
+
+def cook_accept():
+    gdpr_cookie_accept_button = driver.find_element_by_id("gdpr-cookie-accept")
+    gdpr_cookie_accept_button.click()
+
+
+def do_calculation(name="Buneary", cp="503", hp="80", dust="1600"):
+    pokemon_name = driver.find_element_by_name("search_pokemon_name")
+    pokemon_name.send_keys(name)
+    time.sleep(1)
+    search_cp = driver.find_element_by_name("search_cp")
+    search_cp.send_keys(cp)
+    time.sleep(1)
+    search_hp = driver.find_element_by_name("search_hp")
+    xy = pokemon_name.location
+    print(xy.keys())
+    print(xy.values())
+    print(xy['x'])
+    print(type(xy['x']))
+    print(xy['y'])
+    print(type(xy['y']))
+    x, y = xy['x'], xy['y']
+    search_hp.send_keys(hp)
+    time.sleep(1)
+    search_dust = Select(driver.find_element_by_name("search_dust"))
+    search_dust.select_by_value(dust)
+    time.sleep(1)
+    input_element = None
+    try:
+        input_element = driver.find_element_by_id("calculatebtn")
+    except Exception as e:
+        print(e)
+    time.sleep(1)
+    pyautogui.click(x + 75, y + 91)
+    time.sleep(1)
+    pyautogui.moveTo(x + 126, y + 182, 0.5)
+    time.sleep(0.5)
+    pyautogui.click(x + 126, y + 182)
+    time.sleep(1)
+    input_element.click()
+    time.sleep(1)
+    new_rate = check_results()
+    return new_rate
+
+
 if __name__ == '__main__':
     os.environ[GOOGLE_APPLICATION_CREDENTIALS] = key_path
     my_db = Database(database, user, password, host)
@@ -291,5 +263,33 @@ if __name__ == '__main__':
                 for file3 in i:
                     read_detection(db=my_db, input_file=file3, box=fix_box4, cpleng=4, debug=false_flag,
                                    tesseract_config1=psm7_oem1_number, tesseract_config2=psm7_oem1_config_words)
-                # my_db.commit()
+
+    my_db.execute("SELECT * from bugs where checked = FALSE order by (name, cp) desc;")
+    cook_accept()
+    name, cp, hp, dust = None, None, None, None
+
+    for i in my_db.fetchall():
+        print(i)
+        print(type(i[1]))
+
+        if i[0] == name and i[1] <= cp and i[2] >= dust:
+            continue
+        elif i[0] == name and i[1] <= cp and i[2] < dust:
+            do_calculation(i[0], str(i[1]), str(i[2]), str(i[3]))
+            my_value = driver.find_element_by_id("possibleCombinationsStringmax")
+
+            print(my_value.text)
+            # for elem in my_value:
+            #     print(elem.text)
+
+            max_rate = my_value.text[my_value.text.index(":") + 2:]
+            print(my_value.text[my_value.text.index(":") + 2:])
+            print(type(my_value.text[my_value.text.index(":") + 2:]))
+
+            # print(int(my_value.text[my_value.text.index(":")+2:]))
+
+            new_max_rate = float(max_rate.strip('%')) / 100.0
+            name, cp, hp, dust = i[0], str(i[1]), str(i[2]), str(i[3])
+
+            my_db.execute(insert_into_results, (name, cp, dust, new_max_rate))
     my_db.exit()
