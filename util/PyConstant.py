@@ -6,7 +6,31 @@ root_folder = '/home/hdc/Downloads/project/py3cv4/png'
 root_home = '/home/hdc/PycharmProjects/py3cv4/png'
 psm3_config = "-l eng --oem 1 --psm 3"
 psm8_config = "-l eng --oem 1 --psm 8"
-psm0_config_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+
+psm_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+osm_list = [1, 2]
+
+psm_oem_number = '-l eng --psm {} --oem {} -c tessedit_char_whitelist=0123456789'
+psm_config_words = '-l eng --psm {} --oem {} -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+# psm_oem_number = '--psm {} --oem {} -c tessedit_char_whitelist=0123456789'
+# psm_config_words = '--psm {} --oem {} -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+
+psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
+# psm0_oem1_number = '--psm 0 --oem 3 -c tessedit_char_whitelist=0123456789'
 psm1_config_number = '--psm 1 --oem 3 -c tessedit_char_whitelist=0123456789'
 psm2_config_number = '--psm 2 --oem 3 -c tessedit_char_whitelist=0123456789'
 psm3_config_number = '--psm 3 --oem 3 -c tessedit_char_whitelist=0123456789'
@@ -14,6 +38,11 @@ psm4_config_number = '--psm 4 --oem 3 -c tessedit_char_whitelist=0123456789'
 psm5_config_number = '--psm 5 --oem 3 -c tessedit_char_whitelist=0123456789'
 psm6_config_number = '--psm 6 --oem 3 -c tessedit_char_whitelist=0123456789'
 psm7_config_number = '--psm 7 --oem 3 -c tessedit_char_whitelist=0123456789'
+
+
+psm7_oem1_number = '--psm 7 --oem 1 -c tessedit_char_whitelist=0123456789'
+psm7_oem1_config_words = '--psm 7 --oem 1 -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 psm8_config_number = '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789'
 psm9_config_number = '--psm 9 --oem 3 -c tessedit_char_whitelist=0123456789'
 psm10_config_number = '--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789'
@@ -43,3 +72,5 @@ password = "postgres"
 host = "172.16.66.244"
 
 insert_into_bugs = "INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)"
+
+filename = "My_test.PNG"

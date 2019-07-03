@@ -1,10 +1,18 @@
-cur_lsit = []
-str = "this2016"
-for i in str:
-    if i.isalpha():
-        cur_lsit.append(i)
+import os
+import re
+import cv2
+import pytesseract
 
-print(''.join(cur_lsit))
+from pathlib import Path
+from PIL import Image
 
-str = "23443434"
-print (str.isnumeric())
+files = '/home/hdc/Downloads/project/py3cv4/png/2/IMG_5185.PNG'
+image = cv2.imread(files)
+
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+filename = "My_test.PNG"
+cv2.imwrite(filename, gray)
+
+new_image = cv2.imread(os.path.join(str(Path.cwd()), filename))
+cv2.imshow("changed", new_image)
+cv2.waitKey()

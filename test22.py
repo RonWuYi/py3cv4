@@ -120,82 +120,139 @@ def read_detection(db, input_file, box, debug=True, tesseract_config1=None, tess
 
 
 def read_detection2(input_file, box, debug=True, config1=None, config2=None):
-    new_value_list = []
+    new_value_list = [[], [], [], []]
     img = cv2.imread(input_file)
     orig = img.copy()
     # print(type(orig))
     for (startX, startY, endX, endY) in box:
-        img_show(startX, startY, endX, endY, orig, debug)
+        # img_show(startX, startY, endX, endY, orig, debug)
         roi = orig[startY:endY, startX:endX]
         # print(type(roi))
         # text = pytesseract.image_to_string(roi, config=tesseract_config)
 
         if box.index((startX, startY, endX, endY)) == 0:
-            cur_list = []
-            text = pytesseract.image_to_string(roi, config=config1)
-            print(text)
-            for i in text:
-                if i.isnumeric():
-                    cur_list.append(i)
-            # bug_cp = re.search(r'[0-9]*', text).group(0)
-            # if len(bug_cp) > 0:
-            #     new_value_list.append(bug_cp)
-            # else:
-            #     new_value_list.append('0')
-            bug_cp = ''.join(cur_list)
-            # if len(bug_cp) == 0:
-                # cv2.rectangle(orig, (start_x, start_y), (end_x, end_y), (0, 255, 0), 2)
-            # cv2.imshow("origional", roi)
-            # cv2.waitKey(0)
+            while len(new_value_list[0]) == 0:
+                for ii in osm_list:
+                    for jj in psm_list:
+                        text = pytesseract.image_to_string(roi, config1.format(jj, ii))
+                        print(text)
+                        cur_list = []
+                        for i in text:
+                            if i.isnumeric():
+                                cur_list.append(i)
+                        # bug_cp = re.search(r'[0-9]*', text).group(0)
+                        # if len(bug_cp) > 0:
+                        #     new_value_list.append(bug_cp)
+                        # else:
+                        #     new_value_list.append('0')
+                        bug_cp = ''.join(cur_list)
+                    # if len(bug_cp) == 0:
+                        # cv2.rectangle(orig, (start_x, start_y), (end_x, end_y), (0, 255, 0), 2)
+                    # cv2.imshow("origional", roi)
+                    # cv2.waitKey(0)
 
-            new_value_list.append(bug_cp)
+                        new_value_list[0] = bug_cp
         elif box.index((startX, startY, endX, endY)) == 1:
-            cur_list = []
-            text = pytesseract.image_to_string(roi, config=config2)
-            print(text)
-            # print(type(text))
-            # bug_name = re.search(r'[a-z.A-Z]*', text).group(0)
-            # # if len(bug_name) > 0:
-            # #     new_value_list.append(bug_name)
-            # # else:
-            # #     new_value_list.append('empty')
-            # new_value_list.append(bug_name)
-            for i in text:
-                if i.isalpha():
-                    cur_list.append(i)
-            bug_name = ''.join(cur_list)
-            new_value_list.append(bug_name)
-        elif box.index((startX, startY, endX, endY)) == 2:
-            cur_list = []
-            text = pytesseract.image_to_string(roi, config=config1)
-            print(text)
-            for i in text:
-                if i.isnumeric():
-                    cur_list.append(i)
-            bug_hp = ''.join(cur_list)
-            # new_value_list.append(bug_hp)
-            # bug_hp = re.search(r'[0-9]*', text).group(0)
-            # if len(bug_hp) > 0:
-            #     new_value_list.append(bug_hp)
-            # else:
-            #     new_value_list.append('0')
-            new_value_list.append(bug_hp)
-        else:
-            # bug_dust = re.search(r'[0-9]*', text).group(0)
-            cur_list = []
-            text = pytesseract.image_to_string(roi, config=config1)
-            print(text)
 
-            for i in text:
-                if i.isnumeric():
-                    cur_list.append(i)
-            bug_dust = ''.join(cur_list)
-            # bug_dust = text.replace(',', '')
-            # if len(bug_dust) > 0:
-            #     new_value_list.append(bug_dust)
-            # else:
-            #     new_value_list.append('0')
-            new_value_list.append(bug_dust)
+            while len(new_value_list[1]) == 1:
+                for ii in osm_list:
+                    for jj in psm_list:
+                        text = pytesseract.image_to_string(roi, config2.format(jj, ii))
+                        print(text)
+                        cur_list = []
+                        for i in text:
+                            if i.isalpha():
+                                cur_list.append(i)
+                        # bug_cp = re.search(r'[0-9]*', text).group(0)
+                        # if len(bug_cp) > 0:
+                        #     new_value_list.append(bug_cp)
+                        # else:
+                        #     new_value_list.append('0')
+                        bug_name = ''.join(cur_list)
+                        # new_value_list.append(bug_name)
+                        new_value_list[1] = bug_name
+                    # if len(bug_cp) == 0:
+                        # cv2.rectangle(orig, (start_x, start_y), (end_x, end_y), (0, 255, 0), 2)
+                    # cv2.imshow("origional", roi)
+                    # cv2.waitKey(0)
+            # text = pytesseract.image_to_string(roi, config=config2)
+            # print(text)
+            # # print(type(text))
+            # # bug_name = re.search(r'[a-z.A-Z]*', text).group(0)
+            # # # if len(bug_name) > 0:
+            # # #     new_value_list.append(bug_name)
+            # # # else:
+            # # #     new_value_list.append('empty')
+            # # new_value_list.append(bug_name)
+            # for i in text:
+            #     if i.isalpha():
+            #         cur_list.append(i)
+            # bug_name = ''.join(cur_list)
+
+        elif box.index((startX, startY, endX, endY)) == 2:
+            while len(new_value_list[2]) == 0:
+                for ii in osm_list:
+                    for jj in psm_list:
+                        text = pytesseract.image_to_string(roi, config1.format(jj, ii))
+                        print(text)
+                        cur_list = []
+                        for i in text:
+                            if i.isnumeric():
+                                cur_list.append(i)
+                        # bug_cp = re.search(r'[0-9]*', text).group(0)
+                        # if len(bug_cp) > 0:
+                        #     new_value_list.append(bug_cp)
+                        # else:
+                        #     new_value_list.append('0')
+                        bug_hp = ''.join(cur_list)
+                        new_value_list[2] = bug_hp
+            # cur_list = []
+            # text = pytesseract.image_to_string(roi, config=config1)
+            # print(text)
+            # for i in text:
+            #     if i.isnumeric():
+            #         cur_list.append(i)
+            # bug_hp = ''.join(cur_list)
+            # # new_value_list.append(bug_hp)
+            # # bug_hp = re.search(r'[0-9]*', text).group(0)
+            # # if len(bug_hp) > 0:
+            # #     new_value_list.append(bug_hp)
+            # # else:
+            # #     new_value_list.append('0')
+            # new_value_list.append(bug_hp)
+        else:
+
+            while len(new_value_list[3]) == 0:
+                for ii in osm_list:
+                    for jj in psm_list:
+                        text = pytesseract.image_to_string(roi, config1.format(jj, ii))
+                        print(text)
+                        cur_list = []
+                        for i in text:
+                            if i.isnumeric():
+                                cur_list.append(i)
+                        # bug_cp = re.search(r'[0-9]*', text).group(0)
+                        # if len(bug_cp) > 0:
+                        #     new_value_list.append(bug_cp)
+                        # else:
+                        #     new_value_list.append('0')
+                        bug_dust = ''.join(cur_list)
+                        new_value_list[3] = bug_dust
+            # # bug_dust = re.search(r'[0-9]*', text).group(0)
+            # cur_list = []
+            # text = pytesseract.image_to_string(roi, config=config1)
+            # print(text)
+            #
+            # for i in text:
+            #     if i.isnumeric():
+            #         cur_list.append(i)
+            # bug_dust = ''.join(cur_list)
+            # # bug_dust = text.replace(',', '')
+            # # if len(bug_dust) > 0:
+            # #     new_value_list.append(bug_dust)
+            # # else:
+            # #     new_value_list.append('0')
+            # new_value_list.append(bug_dust)
     if debug:
         print(new_value_list)
 
@@ -262,24 +319,25 @@ def walk_folder(path):
 
 
 if __name__ == '__main__':
-    # os.environ[GOOGLE_APPLICATION_CREDENTIALS] = key_path
+    # TESSDATA_PREFIX
+    os.environ['TESSDATA_PREFIX'] = '/usr/share/tesseract-ocr/4.00/share/'
     # my_db = Database(database, user, password, host)
-    for i in walk_folder(root_home):
+    for i in walk_folder(root_folder):
         if len(i) > 0:
-            if walk_folder(root_home).index(i) == 0:
+            if walk_folder(root_folder).index(i) == 0:
                 for file in i:
                     read_detection2(input_file=file, box=fix_box2, debug=true_flag,
-                                    config1=psm1_config_number, config2=psm8_config_words2)
+                                    config1=psm_oem_number, config2=psm_config_words)
                 # my_db.commit()
-            elif walk_folder(root_home).index(i) == 1:
+            elif walk_folder(root_folder).index(i) == 1:
                 for file in i:
                     read_detection2(input_file=file, box=fix_box3, debug=true_flag,
-                                    config1=psm7_config_number, config2=psm7_config_words)
+                                    config1=psm_oem_number, config2=psm_config_words)
                 # my_db.commit()
-            elif walk_folder(root_home).index(i) == 1:
+            elif walk_folder(root_folder).index(i) == 1:
                 for file in i:
                     read_detection2(input_file=file, box=fix_box4, debug=true_flag,
-                                    config1=psm7_config_number, config2=psm7_config_words)
+                                    config1=psm_oem_number, config2=psm_config_words)
                 # my_db.commit()
     # my_db.commit()
     # my_db.exit()
