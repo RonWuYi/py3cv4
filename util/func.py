@@ -6,8 +6,15 @@ import pyautogui
 
 from pathlib import Path
 from util.PyConstant import *
+from datetime import datetime
+from selenium import webdriver
 from googlebase64 import gcpIII
 from selenium.webdriver.support.ui import Select
+
+
+driver = webdriver.Firefox()
+driver.maximize_window()
+driver.get("https://pokeassistant.com/main/ivcalculator")
 
 
 def img_show(start_x, start_y, end_x, end_y, orig, flag):
@@ -21,7 +28,6 @@ def img_show(start_x, start_y, end_x, end_y, orig, flag):
 
 def img_show_block(orig, flag):
     if flag:
-        # cv2.rectangle(orig, (start_x, start_y), (end_x, end_y), (0, 255, 0), 2)
         cv2.imshow("origional", orig)
         cv2.waitKey(0)
 
@@ -36,31 +42,29 @@ def print_values(my_list, flag):
         pass
 
 
-def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=None, tesseract_config2=None):
+def read_detection(db, input_file, box, cp_len, file_name, debug=True,
+                   ocr_cfg1=None, ocr_cfg2=None):
     new_value_list = []
     img = cv2.imread(input_file)
-    # old_orig = img.copy()
     print("handle file {}".format(input_file))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite(filename, gray)
-    new_image = cv2.imread(os.path.join(str(Path.cwd()), filename))
+    cv2.imwrite(file_name, gray)
+    new_image = cv2.imread(os.path.join(str(Path.cwd()), file_name))
     orig = new_image.copy()
     for (startX, startY, endX, endY) in box:
         img_show(startX, startY, endX, endY, orig, debug)
         roi = orig[startY:endY, startX:endX]
         img_show_block(roi, debug)
         if box.index((startX, startY, endX, endY)) == 0:
-            # test
-            value_list = gcpIII.cp_detect(input_file, cpleng)
+            value_list = gcpIII.cp_detect(input_file, cp_len)
             bug_cp = value_list
             print(bug_cp)
             new_value_list.append(bug_cp)
 
         elif box.index((startX, startY, endX, endY)) == 1:
-
             tmp_list1 = []
             tmp_list2 = []
-            text = pytesseract.image_to_string(roi, config=tesseract_config2)
+            text = pytesseract.image_to_string(roi, config=ocr_cfg2)
             for i in text:
                 if i.isalpha():
                     tmp_list1.append(i)
@@ -81,17 +85,13 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
                 print(bug_name)
 
         elif box.index((startX, startY, endX, endY)) == 2:
-
             tmp_list1 = []
             tmp_list2 = []
-            text = pytesseract.image_to_string(roi, config=tesseract_config1)
+            text = pytesseract.image_to_string(roi, config=ocr_cfg1)
             for i in text:
                 if i.isnumeric():
                     tmp_list1.append(i)
             bug_hp = ''.join(tmp_list1)
-
-            # bug_cp = re.search(r'[0-9]*', text).group(0)
-
             if len(bug_hp) > 0:
                 print(bug_hp)
                 new_value_list.append(bug_hp)
@@ -105,12 +105,10 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
                 bug_hp = ''.join(tmp_list2)
                 new_value_list.append(bug_hp)
                 print(bug_hp)
-
         else:
-
             tmp_list1 = []
             tmp_list2 = []
-            text = pytesseract.image_to_string(roi, config=tesseract_config1)
+            text = pytesseract.image_to_string(roi, config=ocr_cfg1)
             for i in text:
                 if i.isnumeric():
                     tmp_list1.append(i)
@@ -134,12 +132,13 @@ def read_detection(db, input_file, box, cpleng, debug=True, tesseract_config1=No
             print(new_value_list)
     print("####################################################################################")
     try:
+        db.execute(insert_into_files, (file_name, datetime.now().isoformat(timespec='seconds')))
         db.execute(insert_into_bugs, (new_value_list[1], int(new_value_list[0]),
-                                      int(new_value_list[2]), int(new_value_list[3])))
+                                      int(new_value_list[2]), int(new_value_list[3]), file_name))
     except Exception as e:
         print(e)
     db.commit()
-    os.remove(os.path.join(str(Path.cwd()), filename))
+    os.remove(os.path.join(str(Path.cwd()), file_name))
     return new_value_list
 
 

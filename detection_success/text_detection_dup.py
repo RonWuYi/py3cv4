@@ -1,12 +1,6 @@
 from util.func import *
 from util.PyConstant import name, cp, dust
 from db.PsyDb import Database
-from selenium import webdriver
-
-
-driver = webdriver.Firefox()
-driver.maximize_window()
-driver.get("https://pokeassistant.com/main/ivcalculator")
 
 
 if __name__ == '__main__':
@@ -16,18 +10,16 @@ if __name__ == '__main__':
         if len(i) > 0:
             if walk_folder(root_folder).index(i) == 0:
                 for file1 in i:
-                    read_detection(db=my_db, input_file=file1, box=fix_box2, cpleng=2, debug=false_flag,
-                                   tesseract_config1=psm7_oem1_number, tesseract_config2=psm7_oem1_config_words)
-                # my_db.commit()
+                    read_detection(db=my_db, input_file=file1, box=fix_box2, cp_len=2, debug=false_flag,
+                                   ocr_cfg1=psm7_oem1_number, ocr_cfg2=psm7_oem1_config_words, file_name=file1)
             elif walk_folder(root_folder).index(i) == 1:
                 for file2 in i:
-                    read_detection(db=my_db, input_file=file2, box=fix_box3, cpleng=3, debug=false_flag,
-                                   tesseract_config1=psm7_oem1_number, tesseract_config2=psm7_oem1_config_words)
-                # my_db.commit()
+                    read_detection(db=my_db, input_file=file2, box=fix_box3, cp_len=3, debug=false_flag,
+                                   ocr_cfg1=psm7_oem1_number, ocr_cfg2=psm7_oem1_config_words, file_name=file2)
             elif walk_folder(root_folder).index(i) == 2:
                 for file3 in i:
-                    read_detection(db=my_db, input_file=file3, box=fix_box4, cpleng=4, debug=false_flag,
-                                   tesseract_config1=psm7_oem1_number, tesseract_config2=psm7_oem1_config_words)
+                    read_detection(db=my_db, input_file=file3, box=fix_box4, cp_len=4, debug=false_flag,
+                                   ocr_cfg1=psm7_oem1_number, ocr_cfg2=psm7_oem1_config_words, file_name=file3)
 
     my_db.execute(select_bugs)
     cook_accept()
@@ -35,7 +27,6 @@ if __name__ == '__main__':
     for i in my_db.fetchall():
         print(i)
         print(type(i[1]))
-
         if i[0] == name and i[1] <= cp and i[2] >= dust:
             continue
         elif i[0] == name and i[1] <= cp and i[2] < dust:

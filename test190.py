@@ -1,9 +1,21 @@
-import os
+import time
+import datetime
 
-# 107  39 40 41
-my_list = ['K', 'P', 'N', ' ', 'N', 'L', '\n', 'T', '#', '3', ':', '3', '2', '\n', '@', ' ', '1', ' ', '0', ' ', '*', ' ', 'O', '\n', '4', '\n', 'C', 'P', '7', '3', '8', '\n', 'L', 'i', 'l', 'e', 'e', 'p', '\n', '1', '0', '7', ' ', '/', ' ', '1', '0', '7', ' ', 'H', 'P', '\n', '2', '8', '.', '0', '2', 'k', 'g', '\n', '1', '.', '0', '3', 'm', '\n', 'H', 'E', 'I', 'G', 'H', 'T', '\n', 'W', 'E', 'I', 'G', 'H', 'T', '\n', 'R', 'O', 'C', 'K', ' ', '/', ' ', 'G', 'R', 'A', 'S', 'S', '\n', '1', '2', '4', ',', '0', '8', '2', '\n', 'S', 'T', 'A', 'R', 'D', 'U', 'S', 'T', '\n', '6', '3', '\n', 'L', 'I', 'L', 'E', 'E', 'P', ' ', 'C', 'A', 'N', 'D', 'Y', '\n', 'P', 'O', 'W', 'E', 'R', ' ', 'U', 'P', '\n', '1', '3', ',', '0', '0', '0', '\n', '3', '\n', '*', ' ', 'E', 'V', 'O', 'L', 'V', 'E', '\n', '5', '0', '\n', 'N', 'E', 'W', ' ', 'A', 'T', 'T', 'A', 'C', 'K', '\n', '5', '0', ',', '0', '0', '0', '\n', '5', '0', '\n']
+from db.PsyDb import Database
+from util import PyConstant
 
-for idx, val in enumerate(my_list):
-    if val == 'C' and my_list[idx + 1] == 'P':
-        for idx, val in enumerate(my_list[idx + 2:]):
-            print(idx, val)
+
+test_db = Database(PyConstant.database, PyConstant.user, PyConstant.password, PyConstant.host)
+
+intsert_file = "insert into files VALUES (%s, %s)"
+test_db.execute(intsert_file, ("test_file2", str(datetime.datetime.now())[:19]))
+test_db.execute(intsert_file, ("test_file3", datetime.datetime.now().isoformat(timespec='seconds')))
+time.sleep(60)
+try:
+    test_db.execute(intsert_file, ("test_file3", datetime.datetime.now().isoformat(timespec='seconds')))
+except Exception as e:
+    print(e)
+# test_db.commit()
+test_db.exit()
+# print(str(datetime.datetime.now())[:19])
+# print(type(datetime.datetime.now()))

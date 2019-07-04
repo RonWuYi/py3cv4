@@ -76,8 +76,11 @@ user = "postgres"
 password = "postgres"
 host = "172.16.66.244"
 
+insert_into_files = "INSERT INTO files (file_name, upload_time) VALUES (%s, %s)"
+
+
 select_bugs = "SELECT * from bugs where checked = FALSE order by (name, cp) desc;"
-insert_into_bugs = "INSERT INTO bugs (name, cp, hp, dust) VALUES (%s, %s, %s, %s)"
+insert_into_bugs = "INSERT INTO bugs (name, cp, hp, dust, file_name) VALUES (%s, %s, %s, %s, %s)"
 insert_into_results = "INSERT INTO results (name, cp, hp, max_rat) VALUES (%s, %s, %s, %s)"
 
 filename = "My_test.PNG"
