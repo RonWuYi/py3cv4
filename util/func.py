@@ -1,8 +1,8 @@
 import os
 import cv2
 import time
-import pytesseract
 import pyautogui
+import pytesseract
 
 from pathlib import Path
 from util.PyConstant import *
@@ -161,32 +161,35 @@ def walk_folder(path):
     return file_list
 
 
-def check_results(test_driver):
-    my_value_max = test_driver.find_element_by_id("possibleCombinationsStringmax")
-    my_value_avg = test_driver.find_element_by_id("possibleCombinationsStringavg")
-    my_value_min = test_driver.find_element_by_id("possibleCombinationsStringmin")
-    # print(my_value.text)
-    # for elem in my_value:
-    #     print(elem.text)
-    max_rate = my_value_max.text[my_value_max.text.index(":") + 2:]
-    print(my_value_max.text[my_value_max.text.index(":") + 2:])
-    print(type(my_value_max.text[my_value_max.text.index(":") + 2:]))
-    # print(int(my_value.text[my_value.text.index(":")+2:]))
-    new_max_rate = float(max_rate.strip('%')) / 100.0
+def check_results(test_driver, debug=false_flag):
+    try:
+        my_value_max = test_driver.find_element_by_id("possibleCombinationsStringmax")
+        my_value_avg = test_driver.find_element_by_id("possibleCombinationsStringavg")
+        my_value_min = test_driver.find_element_by_id("possibleCombinationsStringmin")
 
-    avg_rate = my_value_avg.text[my_value_avg.text.index(":") + 2:]
-    print(my_value_avg.text[my_value_avg.text.index(":") + 2:])
-    print(type(my_value_avg.text[my_value_avg.text.index(":") + 2:]))
-    # print(int(my_value.text[my_value.text.index(":")+2:]))
-    new_avg_rate = float(avg_rate.strip('%')) / 100.0
+        max_rate = my_value_max.text[my_value_max.text.index(":") + 2:]
+        if debug:
+            print(my_value_max.text[my_value_max.text.index(":") + 2:])
+            print(type(my_value_max.text[my_value_max.text.index(":") + 2:]))
 
-    min_rate = my_value_min.text[my_value_min.text.index(":") + 2:]
-    print(my_value_min.text[my_value_min.text.index(":") + 2:])
-    print(type(my_value_min.text[my_value_min.text.index(":") + 2:]))
-    # print(int(my_value.text[my_value.text.index(":")+2:]))
-    new_min_rate = float(min_rate.strip('%')) / 100.0
+        new_max_rate = float(max_rate.strip('%')) / 100.0
 
-    return [new_max_rate, new_avg_rate, new_min_rate]
+        avg_rate = my_value_avg.text[my_value_avg.text.index(":") + 2:]
+        if debug:
+            print(my_value_avg.text[my_value_avg.text.index(":") + 2:])
+            print(type(my_value_avg.text[my_value_avg.text.index(":") + 2:]))
+
+        new_avg_rate = float(avg_rate.strip('%')) / 100.0
+
+        min_rate = my_value_min.text[my_value_min.text.index(":") + 2:]
+        if debug:
+            print(my_value_min.text[my_value_min.text.index(":") + 2:])
+            print(type(my_value_min.text[my_value_min.text.index(":") + 2:]))
+        new_min_rate = float(min_rate.strip('%')) / 100.0
+        return [new_max_rate, new_avg_rate, new_min_rate]
+    except Exception as e:
+        print(e)
+        return []
 
 
 def cook_accept(test_driver):
@@ -194,40 +197,91 @@ def cook_accept(test_driver):
     gdpr_cookie_accept_button.click()
 
 
-def do_calculation(test_driver, name="Buneary", cp="503", hp="80", dust="1600"):
+def do_calculation(test_driver, name_changed=True, name="Buneary", cp="503", hp="80", dust="1600", debug=false_flag):
     pokemon_name = test_driver.find_element_by_name("search_pokemon_name")
-    pokemon_name.send_keys(name)
-    time.sleep(1)
     search_cp = test_driver.find_element_by_name("search_cp")
-    search_cp.send_keys(cp)
-    time.sleep(1)
     search_hp = test_driver.find_element_by_name("search_hp")
-    xy = pokemon_name.location
-    print(xy.keys())
-    print(xy.values())
-    print(xy['x'])
-    print(type(xy['x']))
-    print(xy['y'])
-    print(type(xy['y']))
-    x, y = xy['x'], xy['y']
-    search_hp.send_keys(hp)
-    time.sleep(1)
     search_dust = Select(test_driver.find_element_by_name("search_dust"))
-    search_dust.select_by_value(dust)
-    time.sleep(1)
-    input_element = None
+    xy = pokemon_name.location
+    x, y = xy['x'], xy['y']
+    if name_changed:
+        pokemon_name.send_keys(name)
+        time.sleep(0.5)
+        # search_cp = test_driver.find_element_by_name("search_cp")
+        search_cp.send_keys(cp)
+        time.sleep(0.5)
+        # search_hp = test_driver.find_element_by_name("search_hp")
+        if debug:
+            print(xy.keys())
+            print(xy.values())
+            print(xy['x'])
+            print(type(xy['x']))
+            print(xy['y'])
+            print(type(xy['y']))
+        search_hp.send_keys(hp)
+        time.sleep(0.5)
+        # search_dust = Select(test_driver.find_element_by_name("search_dust"))
+        search_dust.select_by_value(dust)
+        time.sleep(0.5)
+        input_element = None
+        try:
+            input_element = test_driver.find_element_by_id("calculatebtn")
+        except Exception as e:
+            print(e)
+        time.sleep(0.5)
+        pyautogui.click(x + 75, y + 91)
+        time.sleep(1)
+        pyautogui.moveTo(x + 126, y + 185, 0.5)
+        time.sleep(0.5)
+        pyautogui.click(x + 126, y + 182)
+        time.sleep(1)
+        input_element.click()
+        time.sleep(0.5)
+    else:
+        # search_cp = test_driver.find_element_by_name("search_cp")
+        search_cp.send_keys(cp)
+        time.sleep(0.5)
+        # search_hp = test_driver.find_element_by_name("search_hp")
+        # xy = pokemon_name.location
+        if debug:
+            print(xy.keys())
+            print(xy.values())
+            print(xy['x'])
+            print(type(xy['x']))
+            print(xy['y'])
+            print(type(xy['y']))
+        # x, y = xy['x'], xy['y']
+        search_hp.send_keys(hp)
+        time.sleep(0.5)
+        # search_dust = Select(test_driver.find_element_by_name("search_dust"))
+        search_dust.select_by_value(dust)
+        time.sleep(0.5)
+        input_element = None
+        try:
+            input_element = test_driver.find_element_by_id("calculatebtn")
+        except Exception as e:
+            print(e)
+        # time.sleep(1)
+        # pyautogui.click(x + 75, y + 91)
+        # time.sleep(1)
+        # pyautogui.moveTo(x + 126, y + 182, 0.5)
+        # time.sleep(0.5)
+        # pyautogui.click(x + 126, y + 182)
+        time.sleep(1)
+        input_element.click()
+        time.sleep(1)
     try:
-        input_element = test_driver.find_element_by_id("calculatebtn")
+        test_driver.find_element_by_link_text("No combinations found. Are you sure you have not powered-up before?")
+        flag = false_flag
     except Exception as e:
-        print(e)
-    time.sleep(1)
-    pyautogui.click(x + 75, y + 91)
-    time.sleep(1)
-    pyautogui.moveTo(x + 126, y + 182, 0.5)
-    time.sleep(0.5)
-    pyautogui.click(x + 126, y + 182)
-    time.sleep(1)
-    input_element.click()
-    time.sleep(1)
-    new_rate = check_results(test_driver)
-    return new_rate
+        flag = true_flag
+        if debug:
+            print(e)
+    return flag
+    # if flag:
+    #     return False
+    # else:
+    #     return True
+
+    # new_rate = check_results(test_driver)
+    # return new_rate

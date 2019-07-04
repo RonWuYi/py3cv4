@@ -7,7 +7,7 @@ cur = conn.cursor()
 # cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)",(100, "abc'def"))
 
 
-cur.execute("INSERT INTO test (name, cp, hp, dust) VALUES (%s, %s, %s, %s)",("ron", 100, 100, 100))
+cur.execute("INSERT INTO test (name, cp, hp, dust) VALUES (%s, %s, %s, %s)" ("ron", 100, 100, 100))
 conn.commit()
 
 # cur.execute("SELECT * FROM test;")

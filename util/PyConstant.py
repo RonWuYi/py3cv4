@@ -81,7 +81,13 @@ insert_into_files = "INSERT INTO files (file_name, upload_time) VALUES (%s, %s)"
 
 select_bugs = "SELECT * from bugs where checked = FALSE order by (name, cp) desc;"
 insert_into_bugs = "INSERT INTO bugs (name, cp, hp, dust, file_name) VALUES (%s, %s, %s, %s, %s)"
-insert_into_results = "INSERT INTO results (name, cp, hp, max_rat) VALUES (%s, %s, %s, %s)"
+
+update_useless_bug = """UPDATE bugs SET useless = %s where file_name = %s"""
+update_checked_bug = """UPDATE bugs SET checked = %s where file_name = %s"""
+
+
+insert_into_results = "INSERT INTO results (name, cp, dust, max_rate, avg_rate, min_rate, file_name) " \
+                      "VALUES (%s, %s, %s, %s, %s, %s, %s)"
 
 fixed_test_name = "My_test.PNG"
 tmp_filename = "tmp{}.PNG"
