@@ -7,14 +7,8 @@ import pyautogui
 from pathlib import Path
 from util.PyConstant import *
 from datetime import datetime
-from selenium import webdriver
 from googlebase64 import gcpIII
 from selenium.webdriver.support.ui import Select
-
-
-driver = webdriver.Firefox()
-driver.maximize_window()
-driver.get("https://pokeassistant.com/main/ivcalculator")
 
 
 def img_show(start_x, start_y, end_x, end_y, orig, flag):
@@ -46,10 +40,11 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
                    ocr_cfg1=None, ocr_cfg2=None):
     new_value_list = []
     img = cv2.imread(input_file)
-    print("handle file {}".format(input_file))
+    if debug:
+        print("handle file {}".format(input_file))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite(file_name, gray)
-    new_image = cv2.imread(os.path.join(str(Path.cwd()), file_name))
+    cv2.imwrite(fixed_test_name, gray)
+    new_image = cv2.imread(os.path.join(str(Path.cwd()), fixed_test_name))
     orig = new_image.copy()
     for (startX, startY, endX, endY) in box:
         img_show(startX, startY, endX, endY, orig, debug)
@@ -58,9 +53,9 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
         if box.index((startX, startY, endX, endY)) == 0:
             value_list = gcpIII.cp_detect(input_file, cp_len)
             bug_cp = value_list
-            print(bug_cp)
+            if debug:
+                print(bug_cp)
             new_value_list.append(bug_cp)
-
         elif box.index((startX, startY, endX, endY)) == 1:
             tmp_list1 = []
             tmp_list2 = []
@@ -69,9 +64,9 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
                 if i.isalpha():
                     tmp_list1.append(i)
             bug_name = ''.join(tmp_list1)
-
             if len(bug_name) > 0:
-                print(bug_name)
+                if debug:
+                    print(bug_name)
                 new_value_list.append(bug_name)
             else:
                 cv2.imwrite(tmp_filename, roi)
@@ -82,8 +77,8 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
                         tmp_list2.append(i)
                 bug_name = ''.join(tmp_list2)
                 new_value_list.append(bug_name)
-                print(bug_name)
-
+                if debug:
+                    print(bug_name)
         elif box.index((startX, startY, endX, endY)) == 2:
             tmp_list1 = []
             tmp_list2 = []
@@ -93,7 +88,8 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
                     tmp_list1.append(i)
             bug_hp = ''.join(tmp_list1)
             if len(bug_hp) > 0:
-                print(bug_hp)
+                if debug:
+                    print(bug_hp)
                 new_value_list.append(bug_hp)
             else:
                 cv2.imwrite(tmp_filename, roi)
@@ -104,7 +100,8 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
                         tmp_list2.append(i)
                 bug_hp = ''.join(tmp_list2)
                 new_value_list.append(bug_hp)
-                print(bug_hp)
+                if debug:
+                    print(bug_hp)
         else:
             tmp_list1 = []
             tmp_list2 = []
@@ -115,7 +112,8 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
             bug_dust = ''.join(tmp_list1)
 
             if len(bug_dust) > 0:
-                print(bug_dust)
+                if debug:
+                    print(bug_dust)
                 new_value_list.append(bug_dust)
             else:
                 cv2.imwrite(tmp_filename, roi)
@@ -126,11 +124,12 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
                         tmp_list2.append(i)
                 bug_dust = ''.join(tmp_list2)
                 new_value_list.append(bug_dust)
-                print(bug_dust)
+                if debug:
+                    print(bug_dust)
 
         if debug:
             print(new_value_list)
-    print("####################################################################################")
+            print("####################################################################################")
     try:
         db.execute(insert_into_files, (file_name, datetime.now().isoformat(timespec='seconds')))
         db.execute(insert_into_bugs, (new_value_list[1], int(new_value_list[0]),
@@ -138,7 +137,7 @@ def read_detection(db, input_file, box, cp_len, file_name, debug=True,
     except Exception as e:
         print(e)
     db.commit()
-    os.remove(os.path.join(str(Path.cwd()), file_name))
+    os.remove(os.path.join(str(Path.cwd()), fixed_test_name))
     return new_value_list
 
 
@@ -162,10 +161,10 @@ def walk_folder(path):
     return file_list
 
 
-def check_results():
-    my_value_max = driver.find_element_by_id("possibleCombinationsStringmax")
-    my_value_avg = driver.find_element_by_id("possibleCombinationsStringavg")
-    my_value_min = driver.find_element_by_id("possibleCombinationsStringmin")
+def check_results(test_driver):
+    my_value_max = test_driver.find_element_by_id("possibleCombinationsStringmax")
+    my_value_avg = test_driver.find_element_by_id("possibleCombinationsStringavg")
+    my_value_min = test_driver.find_element_by_id("possibleCombinationsStringmin")
     # print(my_value.text)
     # for elem in my_value:
     #     print(elem.text)
@@ -190,19 +189,19 @@ def check_results():
     return [new_max_rate, new_avg_rate, new_min_rate]
 
 
-def cook_accept():
-    gdpr_cookie_accept_button = driver.find_element_by_id("gdpr-cookie-accept")
+def cook_accept(test_driver):
+    gdpr_cookie_accept_button = test_driver.find_element_by_id("gdpr-cookie-accept")
     gdpr_cookie_accept_button.click()
 
 
-def do_calculation(name="Buneary", cp="503", hp="80", dust="1600"):
-    pokemon_name = driver.find_element_by_name("search_pokemon_name")
+def do_calculation(test_driver, name="Buneary", cp="503", hp="80", dust="1600"):
+    pokemon_name = test_driver.find_element_by_name("search_pokemon_name")
     pokemon_name.send_keys(name)
     time.sleep(1)
-    search_cp = driver.find_element_by_name("search_cp")
+    search_cp = test_driver.find_element_by_name("search_cp")
     search_cp.send_keys(cp)
     time.sleep(1)
-    search_hp = driver.find_element_by_name("search_hp")
+    search_hp = test_driver.find_element_by_name("search_hp")
     xy = pokemon_name.location
     print(xy.keys())
     print(xy.values())
@@ -213,12 +212,12 @@ def do_calculation(name="Buneary", cp="503", hp="80", dust="1600"):
     x, y = xy['x'], xy['y']
     search_hp.send_keys(hp)
     time.sleep(1)
-    search_dust = Select(driver.find_element_by_name("search_dust"))
+    search_dust = Select(test_driver.find_element_by_name("search_dust"))
     search_dust.select_by_value(dust)
     time.sleep(1)
     input_element = None
     try:
-        input_element = driver.find_element_by_id("calculatebtn")
+        input_element = test_driver.find_element_by_id("calculatebtn")
     except Exception as e:
         print(e)
     time.sleep(1)
@@ -230,5 +229,5 @@ def do_calculation(name="Buneary", cp="503", hp="80", dust="1600"):
     time.sleep(1)
     input_element.click()
     time.sleep(1)
-    new_rate = check_results()
+    new_rate = check_results(test_driver)
     return new_rate

@@ -138,7 +138,7 @@ for i in cur.fetchall():
         name, cp, hp, dust = i[0], str(i[1]), str(i[2]), str(i[3])
 
         cur.execute(insert_into_results, (name, cp, dust, new_max_rate))
-        cur.commite
+        # cur.commite
 
         if new_max_rate > 0.89:
             print(new_max_rate)

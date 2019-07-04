@@ -83,6 +83,6 @@ select_bugs = "SELECT * from bugs where checked = FALSE order by (name, cp) desc
 insert_into_bugs = "INSERT INTO bugs (name, cp, hp, dust, file_name) VALUES (%s, %s, %s, %s, %s)"
 insert_into_results = "INSERT INTO results (name, cp, hp, max_rat) VALUES (%s, %s, %s, %s)"
 
-filename = "My_test.PNG"
+fixed_test_name = "My_test.PNG"
 tmp_filename = "tmp{}.PNG"
 second_tmp_filename = "tmp_second{}.PNG"
