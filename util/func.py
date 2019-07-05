@@ -198,19 +198,23 @@ def cook_accept(test_driver):
 
 
 def do_calculation(test_driver, name_changed=True, name="Buneary", cp="503", hp="80", dust="1600", debug=false_flag):
-    pokemon_name = test_driver.find_element_by_name("search_pokemon_name")
-    search_cp = test_driver.find_element_by_name("search_cp")
-    search_hp = test_driver.find_element_by_name("search_hp")
-    search_dust = Select(test_driver.find_element_by_name("search_dust"))
+    time.sleep(0.5)
+    try:
+        pokemon_name = test_driver.find_element_by_name("search_pokemon_name")
+        search_cp = test_driver.find_element_by_name("search_cp")
+        search_hp = test_driver.find_element_by_name("search_hp")
+        search_dust = Select(test_driver.find_element_by_name("search_dust"))
+    except Exception as e:
+        print(e)
+        return false_flag
     xy = pokemon_name.location
     x, y = xy['x'], xy['y']
     if name_changed:
+        time.sleep(0.5)
         pokemon_name.send_keys(name)
-        time.sleep(0.5)
-        # search_cp = test_driver.find_element_by_name("search_cp")
+        time.sleep(1)
         search_cp.send_keys(cp)
-        time.sleep(0.5)
-        # search_hp = test_driver.find_element_by_name("search_hp")
+        time.sleep(1)
         if debug:
             print(xy.keys())
             print(xy.values())
@@ -219,16 +223,20 @@ def do_calculation(test_driver, name_changed=True, name="Buneary", cp="503", hp=
             print(xy['y'])
             print(type(xy['y']))
         search_hp.send_keys(hp)
-        time.sleep(0.5)
-        # search_dust = Select(test_driver.find_element_by_name("search_dust"))
-        search_dust.select_by_value(dust)
-        time.sleep(0.5)
+        time.sleep(1)
+        try:
+            search_dust.select_by_value(dust)
+        except Exception as e:
+            print(e)
+            return false_flag
+        time.sleep(1)
         input_element = None
         try:
             input_element = test_driver.find_element_by_id("calculatebtn")
         except Exception as e:
             print(e)
-        time.sleep(0.5)
+            return false_flag
+        time.sleep(1)
         pyautogui.click(x + 75, y + 91)
         time.sleep(1)
         pyautogui.moveTo(x + 126, y + 185, 0.5)
@@ -236,13 +244,11 @@ def do_calculation(test_driver, name_changed=True, name="Buneary", cp="503", hp=
         pyautogui.click(x + 126, y + 182)
         time.sleep(1)
         input_element.click()
-        time.sleep(0.5)
+        time.sleep(1)
     else:
-        # search_cp = test_driver.find_element_by_name("search_cp")
-        search_cp.send_keys(cp)
         time.sleep(0.5)
-        # search_hp = test_driver.find_element_by_name("search_hp")
-        # xy = pokemon_name.location
+        search_cp.send_keys(cp)
+        time.sleep(1)
         if debug:
             print(xy.keys())
             print(xy.values())
@@ -250,17 +256,20 @@ def do_calculation(test_driver, name_changed=True, name="Buneary", cp="503", hp=
             print(type(xy['x']))
             print(xy['y'])
             print(type(xy['y']))
-        # x, y = xy['x'], xy['y']
         search_hp.send_keys(hp)
-        time.sleep(0.5)
-        # search_dust = Select(test_driver.find_element_by_name("search_dust"))
-        search_dust.select_by_value(dust)
-        time.sleep(0.5)
+        time.sleep(1)
+        try:
+            search_dust.select_by_value(dust)
+        except Exception as e:
+            print(e)
+            return false_flag
+        time.sleep(1)
         input_element = None
         try:
             input_element = test_driver.find_element_by_id("calculatebtn")
         except Exception as e:
             print(e)
+            return false_flag
         # time.sleep(1)
         # pyautogui.click(x + 75, y + 91)
         # time.sleep(1)
@@ -278,10 +287,3 @@ def do_calculation(test_driver, name_changed=True, name="Buneary", cp="503", hp=
         if debug:
             print(e)
     return flag
-    # if flag:
-    #     return False
-    # else:
-    #     return True
-
-    # new_rate = check_results(test_driver)
-    # return new_rate

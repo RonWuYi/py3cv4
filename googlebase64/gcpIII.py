@@ -135,7 +135,8 @@ def cp_detect(path, cpleng):
     for page in response.full_text_annotation.text:
         my_list.append(page)
     # new_list = [x for x in my_list if x in string.ascii_letters or x in string.octdigits]
-    print(my_list)
+    if False:
+        print(my_list)
     for idx, val in enumerate(my_list):
         # if val.isdigit()
         if (val == 'C' or val == 'c') and (my_list[idx + 1] == 'P' or my_list[idx + 1] == 'p'):
