@@ -1,6 +1,7 @@
 import os
 import cv2
 import time
+import shutil
 import pyautogui
 import pytesseract
 
@@ -9,6 +10,14 @@ from util.PyConstant import *
 from datetime import datetime
 from googlebase64 import gcpIII
 from selenium.webdriver.support.ui import Select
+
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'PNG'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def img_show(start_x, start_y, end_x, end_y, orig, flag):
@@ -287,3 +296,7 @@ def do_calculation(test_driver, name_changed=True, name="Buneary", cp="503", hp=
         if debug:
             print(e)
     return flag
+
+
+def clean_up(path):
+    shutil.rmtree(path=path)
